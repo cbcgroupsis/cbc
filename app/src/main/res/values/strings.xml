@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">CBC GROUP</string>
+    <!-- ************************************* LOGIN_ACTIVITY ***********************************-->
+    <string name="login_user_name">User name</string>
+    <string name="login_user_password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="login_logo">CBC GROUP</string>
+    <string name="login_password_olvidado">Olvido su contraseña?</string>
+    <string name="login_register"> Registrar</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="Inicio">Inicio</string>
+    <string name="edtNombreMenu">nombre - sector</string>
+    <string name="edtMailMenu">email</string>
+    <!--**PROGRESS DIALOG**-->
+    <string name="progressDialogTitulo">Logeando...</string>
+    <string name="progressDialogMensaje">Espere por favor...</string>
+    <!--**CONFIRM**-->
+    <string name="ConfirmUserPassword">btn Login-> btn:Ok</string>
+    <!--**ERROR**-->
+    <string name="ErrorUserPassword">Error: Complete todos los campos.</string>
+    <!-- ************************************* HOME_ACTIVITY ***********************************-->
+    <string name="home_name_toolbar">Inicio</string>
+    <string name="home_menu_sesion_close">Cerrar sesion</string>
+    <string name="home_menu_option">Opcion</string>
+    <string name="home_menu_web_dct">Web DCT</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_tecnicos">TecnicosActivity</string>
+</resources>

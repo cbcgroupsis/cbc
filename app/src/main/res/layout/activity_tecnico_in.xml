@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.TecnicoIn">
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_color"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="0.9">
+            <TextView
+                android:id="@+id/tec_modelo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="30dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Serie:"
+                android:textColor="#ffffff"/>
+            <TextView
+                android:id="@+id/tec_subItem_serie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/rounded_textviewa" />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sector:"
+                android:textColor="#ffffff"/>
+            <TextView
+                android:id="@+id/tec_subItem_sector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/rounded_textviewa" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha:"
+                android:textColor="#ffffff"/>
+            <TextView
+                android:id="@+id/tec_subItem_fecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/rounded_textviewa" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha Vencimiento:"
+                android:textColor="#ffffff"/>
+            <TextView
+                android:id="@+id/tec_subItem_fechaVencimiento"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/rounded_textviewa" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Inconveniente:"
+                android:textColor="#ffffff"/>
+            <TextView
+                android:id="@+id/tec_subItem_inconveniente"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:autoSizeMaxTextSize="100sp"
+                android:autoSizeMinTextSize="1sp"
+                android:autoSizeStepGranularity="1sp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/rounded_textviewa" />
+        </LinearLayout>
+        <Button
+            android:layout_weight="0.1"
+            android:id="@+id/ingresar"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="#00C853"
+            android:gravity="center"
+            android:hint="Ingresar"
+            android:layout_marginVertical="10dp"
+            android:textColorHint="#ffffff" />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

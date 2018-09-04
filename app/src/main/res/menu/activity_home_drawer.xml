@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <!-- ******************************* DEFAULT *********************************************-->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/home"
+            android:icon="@drawable/img_icono_home"
+            android:title="Home" />
+    </group>
+    <!-- ******************************* Logistica *********************************************-->
+    <group android:id="@+id/menu_logistica"
+        android:visible="false">
+        <item android:title="Logistica">
+            <menu>
+                <item
+                    android:id="@+id/logistica_insumos"
+                    android:icon="@drawable/img_icono_logistica"
+                    android:title="Logistica" />
+            </menu>
+        </item>
+    </group>
+    <!-- ******************************* Tecnicos  *********************************************-->
+    <group android:id="@+id/menu_tecnicos"
+        android:visible="false">
+        <item android:title="Tecnicos">
+            <menu>
+                <item
+                    android:id="@+id/tecnicos_tecnicos"
+                    android:icon="@drawable/img_icono_tecnico"
+                    android:title="Tecnicos" />
+            </menu>
+        </item>
+    </group>
+    <!-- ******************************* Cliente *********************************************-->
+    <group android:id="@+id/menu_cliente"
+        android:visible="false">
+        <item android:title="Cliente">
+            <menu>
+                <item
+                    android:id="@+id/cliente_pedidos_insumos"
+                    android:icon="@drawable/ic_menu_gallery"
+                    android:title="Pedido de Insumos" />
+
+                <item
+                    android:id="@+id/cliente_tecnicos"
+                    android:icon="@drawable/img_icono_tecnico"
+                    android:title="Servicio Tecnico" />
+
+                <item
+                    android:id="@+id/cliente_contadores"
+                    android:icon="@drawable/img_icono_contadores"
+                    android:title="Contadores" />
+
+                <item
+                    android:id="@+id/cliente_preferencia"
+                    android:icon="@drawable/img_icono_preferencia"
+                    android:title="Preferencia" />
+            </menu>
+        </item>
+    </group>
+
+    <!-- ******************************* DEFAULT *********************************************-->
+    <item android:title="Extras">
+        <menu>
+
+            <item
+                android:id="@+id/web_dct"
+                android:icon="@drawable/img_icono_internet"
+                android:title="@string/home_menu_web_dct" />
+            <item
+                android:id="@+id/option_menu"
+                android:icon="@drawable/img_icono_opciones"
+                android:title="@string/home_menu_option" />
+            <item
+                android:id="@+id/reportar"
+                android:icon="@drawable/img_icono_reportes"
+                android:title="Reportar problemas" />
+            <item
+                android:id="@+id/login_close"
+                android:icon="@drawable/img_icono_logout"
+                android:title="@string/home_menu_sesion_close" />
+        </menu>
+    </item>
+
+</menu>

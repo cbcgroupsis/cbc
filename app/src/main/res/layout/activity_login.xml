@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.LoginActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="1"
+        android:background="@drawable/gradient_color">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6" >
+            <!--********************************** BANNER **************************************-->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/logo_cbc_group"
+                android:contentDescription="@string/login_logo"
+                android:visibility="visible"/>
+
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:layout_weight="0.4"
+            >
+            <!--************************************ INPUT **************************************-->
+            <!--********************************** USER NAME ************************************-->
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#42A5F5">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/edtUserName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_user_name"
+                    android:textColorHint="#7986CB"
+                    android:inputType="textPersonName"
+                    android:textColor="#ffffff"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <!--********************************** PASSWORD *************************************-->
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:passwordToggleEnabled="true"
+                >
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/edtUserPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_user_password"
+                    android:textColorHint="#7986CB"
+                    android:inputType="textPassword"
+                    android:textColor="#ffffff"
+                    android:background="#42A5F5"
+                    />
+                <CheckBox
+                    android:id="@+id/login_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="#E8EAF6"
+                    android:hint="Recordar usuario!"
+                    android:gravity="center"
+                    />
+                <!--********************************** BOTONES ********************************-->
+                <Button
+                    android:id="@+id/btnLoginConfirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="@string/login_button"
+                    android:textColorHint="#ffffff"
+                    android:background="#2196F3"
+                    />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

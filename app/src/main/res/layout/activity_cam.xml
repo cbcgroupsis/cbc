@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.CamActivity">
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_color"
+        android:weightSum="1"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/txvModelo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+            android:textColor="#FFFFFF"
+            android:textSize="30dp" />
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="0.9">
+
+            <ImageButton
+                android:id="@+id/imgInsumos"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:src="@drawable/img_icono_camara"
+                android:background="@drawable/rounded_textviewa" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Npedido - Serie:"
+                android:textColor="#ffffff"/>
+            <TextView
+                android:id="@+id/txvSerie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_textviewa" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cliente:"
+                android:textColor="#ffffff"/>
+            <TextView
+                android:id="@+id/txvCliente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_textviewa" />
+
+
+        </LinearLayout>
+        <Button
+            android:layout_weight="0.1"
+            android:id="@+id/btnEnviarFoto"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="#00C853"
+            android:gravity="center"
+            android:hint="Enviar"
+            android:layout_marginVertical="10dp"
+            android:textColorHint="#ffffff" />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_color"
+    tools:context=".Activity.ReporteDeErroresActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="20dp"
+        android:weightSum="1">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="         REPORTAR PROBLEMAS"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="10dp"
+            android:textSize="20dp"
+            android:textColor="#ffffff"
+            android:layout_weight="0.85"/>
+        <EditText
+            android:id="@+id/mensajeReporet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:background="@drawable/rounded_textviewa"
+            android:gravity="top|left"
+            android:inputType="textMultiLine"
+            android:hint="Reportar Problema:"
+            android:scrollHorizontally="false"
+            android:layout_marginVertical="10dp"/>
+        <Button
+            android:layout_weight="0.0"
+            android:id="@+id/btnRepor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="Enviar"
+            android:textColorHint="#ffffff"
+            android:background="#00C853"
+            />
+
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
