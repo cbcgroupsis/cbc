@@ -6,8 +6,10 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -37,6 +39,10 @@ import java.util.Map;
 
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
+import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbInsumosSinInternet;
+import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -58,7 +64,8 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
     private String imageurl;
     /////////////////////////////////////////////
     String nombre,serie;
-
+    private SQLite sql;
+    private ConnSQLiteHelper con;
 
 
 
@@ -66,6 +73,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_cam );
         txvCliente=findViewById( R.id.txvCliente );
@@ -76,6 +84,8 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         btnEnviar.setOnClickListener( this );
         imgInsumos.setOnClickListener( this );
         cbc = new CBC(CamActivity.this);
+        con =  new ConnSQLiteHelper( this,"bdtecSinInternet",null, 1);
+        sql = new SQLite();
         CargarInfo();
 
 
@@ -141,7 +151,8 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                uploadImage();
+            if(cbc.Internet()) uploadImage();
+            else GuardarInformacion();
 
             }
         });
@@ -231,8 +242,10 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
                     public void onErrorResponse(VolleyError volleyError)
                     {
                         loading.dismiss();
-                        Toast.makeText(CamActivity.this, "Error: No se pudo subir la imagen", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(CamActivity.this, "Error: No se pudo subir la imagen", Toast.LENGTH_LONG).show();
+
                         //Toast.makeText( Cam.this,volleyError.toString(),Toast.LENGTH_LONG ).show();
+                        GuardarInformacion();
 
                     }
                 })
@@ -261,5 +274,24 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         requestQueue.add(stringRequest);
     }
 
-
+    private void GuardarInformacion()
+    {
+        Bitmap foto;
+        String imagen="";
+        Bundle extra= getIntent().getExtras();
+        if(thumbnail!=null)
+        {
+            foto = Bitmap.createScaledBitmap(thumbnail, 500, 500, true);
+            imagen = getStringImagen( foto);
+        }
+        Map<String, String> params = new Hashtable<>();
+        params.clear();
+        params.put( dbInsumosSinInternet.CAMPO_FOTO, imagen);
+        params.put(dbInsumosSinInternet.CAMPO_SERIE,extra.getString( "numSerie" ));
+        params.put(dbInsumosSinInternet.CAMPO_NOMBRE, cbc.getdUserName());
+        params.put(dbInsumosSinInternet.CAMPO_NPEDIDO,cbc.getInsumosNpedidos());
+        SQLiteDatabase db=con.getWritableDatabase();
+        sql.Add(db, dbInsumosSinInternet.TABLE,params);
+        startActivity( new Intent(this,HomeActivity.class ).putExtra( "homeStart","homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ));
+    }
 }

@@ -6,8 +6,10 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -15,8 +17,10 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.system.ErrnoException;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,13 +46,17 @@ import java.util.Map;
 
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
+import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
+import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class TecnicosOut extends AppCompatActivity implements View.OnClickListener
 {
-    private static final String TAG = "TecnicosInActivity";
+    private static final String TAG = "TecnicosOutActivity";
     private String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/hoja_de_reparacion.php?";
     private String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
     private String URLIMAGEN = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
@@ -67,9 +75,13 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     ///////////////// CAM RESULT /////////////////
     private Bitmap thumbnail;
     private String imageurl;
+    private ConnSQLiteHelper con;
+    private SQLite sql;
     /////////////////////////////////////////////
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_tecnicos_out );
         modelo=findViewById( R.id.tec_modelo );
@@ -86,6 +98,8 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         button.setOnClickListener( this );
         imgTec.setOnClickListener( this );
         cbc= new CBC(TecnicosOut.this);
+        con =  new ConnSQLiteHelper( TecnicosOut.this,"bdtecSinInternet",null, 1);
+        sql = new SQLite();
         extra=getIntent().getExtras();
         if(cbc.Internet()) completeInfo();
         else Toast.makeText( this,"NO TIENE ACCESO A INTERNET O SU CONNCECION ES MUY LENTA, VUELVA ATRAS Y INTENTE NUEVAMENTE",Toast.LENGTH_LONG ).show();
@@ -98,13 +112,40 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         {
             if(tareaRealizada.length()>=5)
             {
-                if (!copiasColor.getText().toString().matches( "" )) copiasColor.setText( "0" );
-                if (!copias.getText().toString().matches( "" )) copias.setText( "0" );
+                if (copiasColor.getText().toString().matches( "" )) copiasColor.setText( "0" );
+                if (copias.getText().toString().matches( "" )) copias.setText( "0" );
                 if (!viaje.getText().toString().matches( "" ))
                 {
-                    CerrarPedido();
-                   // SubirImagen();
+                    if(cbc.Internet())
+                    {
+                        if(thumbnail==null)
+                        {
 
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,AlertDialog.THEME_HOLO_DARK);
+                            alertDialogBuilder.setMessage("Desea cerrar el pedido tecnico sin subir imagen?");
+                            alertDialogBuilder.setCancelable(false);
+                            alertDialogBuilder.setPositiveButton("Si", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+
+                                {
+                                    CerrarPedido();
+
+                                }
+                            });
+                            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    Toast.makeText(TecnicosOut.this, "Cancelado", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            AlertDialog alertDialog=alertDialogBuilder.create();
+                            alertDialog.show();
+                        } else  CerrarPedido();
+                    }else GuardarInformacion();
                 } else
                     Toast.makeText( this, "Ingrese el Tiempo de viaje", Toast.LENGTH_SHORT ).show();
             }else Toast.makeText( this, "Ingrese la tarea realizada", Toast.LENGTH_SHORT ).show();
@@ -212,7 +253,9 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                         cbc.setIngresoTecnico(false);
                         cbc.setIngresonpedido( extra.getString( "" ));
                         Toast.makeText( TecnicosOut.this, "Se cerro el pedido correctamente!", Toast.LENGTH_SHORT ).show();
-                        SubirImagen();
+                        if(thumbnail!=null) SubirImagen();
+                        else startActivity( new Intent(TecnicosOut.this,HomeActivity.class ).putExtra( "homeStart","homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ));
+
 
                     }
                 },
@@ -238,6 +281,16 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                 params.put("copias",copias.getText().toString());
                 params.put("copiasColor",copiasColor.getText().toString());
                 params.put("viaje",viaje.getText().toString());
+
+
+                Log.w(TAG,params.get( "id_tecnico" ));
+                Log.w(TAG,params.get( "serie" ));
+                Log.w(TAG,params.get( "id_parte" ));
+                Log.w(TAG,params.get( "mensaje" ));
+                Log.w(TAG,params.get( "copias" ));
+                Log.w(TAG,params.get( "copiasColor" ));
+                Log.w(TAG,params.get( "viaje" ));
+
                 return params;
             }
 
@@ -381,4 +434,69 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         requestQueue.add(stringRequest);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if(keyCode== KeyEvent.KEYCODE_BACK)
+        {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,AlertDialog.THEME_HOLO_DARK);
+            alertDialogBuilder.setMessage("Desea volver a la pantalla anterior?");
+            alertDialogBuilder.setCancelable(false);
+            alertDialogBuilder.setPositiveButton("Si", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+
+                {
+                    finish();
+
+                }
+            });
+            alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    Toast.makeText(TecnicosOut.this, "Cancelado", Toast.LENGTH_SHORT).show();
+                }
+            });
+            AlertDialog alertDialog=alertDialogBuilder.create();
+            alertDialog.show();
+            return true;
+        }
+        return super.onKeyDown( keyCode, event );
+    }
+    private void GuardarInformacion()
+    {
+        Bitmap foto;
+        String imagen="";
+        if(thumbnail!=null)
+        {
+            foto = Bitmap.createScaledBitmap(thumbnail, 500, 500, true);
+             imagen = getStringImagen( foto);
+        }
+        Map<String, String> params = new Hashtable<>();
+        params.clear();
+        params.put( dbTecSinInternet.CAMPO_FOTO, imagen);
+        params.put(dbTecSinInternet.CAMPO_IDTEC,cbc.getdUserId());
+        params.put(dbTecSinInternet.CAMPO_SERIE,serie.getText().toString());
+        params.put(dbTecSinInternet.CAMPO_IDPARTE, extra.getString( "npedido" ));
+        params.put(dbTecSinInternet.CAMPO_MENSAJE,tareaRealizada.getText().toString());
+        params.put(dbTecSinInternet.CAMPO_COPIAS,copias.getText().toString());
+        params.put(dbTecSinInternet.CAMPO_COPIASCOLOR,copiasColor.getText().toString());
+        params.put(dbTecSinInternet.CAMPO_TVIAJE,viaje.getText().toString());
+        params.put(dbTecSinInternet.CAMPO_ESPERA,"1");
+
+        Log.w(TAG,"id_tec->"+params.get( "id_tecnico" ));
+        Log.w(TAG,"serie->"+params.get( "serie" ));
+        Log.w(TAG,"idparte->"+params.get( "id_parte" ));
+        Log.w(TAG,"mensaje->"+params.get( "mensaje" ));
+        Log.w(TAG,"copias->"+params.get( "copias" ));
+        Log.w(TAG,"CopiasColor->"+params.get( "copiasColor" ));
+        Log.w(TAG,"tviaje->"+params.get( "viaje" ));
+        Log.w(TAG,"Foto->"+imagen);
+        SQLiteDatabase db=con.getWritableDatabase();
+        sql.Add(db, dbTecSinInternet.TABLE,params);
+        startActivity( new Intent(TecnicosOut.this,HomeActivity.class ).putExtra( "homeStart","homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ));
+    }
 }

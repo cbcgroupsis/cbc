@@ -1,5 +1,7 @@
 package cbcgroup.cbc.Activity;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -28,6 +30,9 @@ import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.Insumos.AdapterInsumos;
 import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
+import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 
 public class InsumosSubItem extends AppCompatActivity {
 
@@ -38,6 +43,9 @@ public class InsumosSubItem extends AppCompatActivity {
     ListInsumo insumos = new ListInsumo();
     AdapterInsumos adapter;
     CBC cbc;
+
+    private SQLite sql;
+    private ConnSQLiteHelper con;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -50,6 +58,9 @@ public class InsumosSubItem extends AppCompatActivity {
         cbc=new CBC(InsumosSubItem.this);
         setSupportActionBar( toolbar );
         Bundle extra=getIntent().getExtras();
+
+        con =  new ConnSQLiteHelper( this,"bdtecSinInternet",null, 1);
+        sql = new SQLite();
         if(extra!=null)
         {
             getSupportActionBar().setTitle("Insumos - Npedido: "+extra.getString( "npedido"));
@@ -58,7 +69,12 @@ public class InsumosSubItem extends AppCompatActivity {
             //instalar jaja
         }
         if(cbc.Internet()) Programa();
-        else Toast.makeText( this,"NO TIENE ACCESO A INTERNET O SU CONNCECION ES MUY LENTA",Toast.LENGTH_LONG ).show();
+        else
+            {
+                Toast.makeText( this,"NO TIENE ACCESO A INTERNET O SU CONNCECION ES MUY LENTA",Toast.LENGTH_LONG ).show();
+                ProgramaSinConexion( cbc.getInsumosNpedidos() );
+            }
+
 
 
     }
@@ -142,6 +158,31 @@ public class InsumosSubItem extends AppCompatActivity {
 
         };
         requestQueue.add(stringRequest);
+    }
+
+
+    private void ProgramaSinConexion(String npedido)
+    {
+        final ArrayList<ListInsumo> list=new ArrayList<>();
+        list.clear();
+        SQLiteDatabase db = con.getWritableDatabase();
+        String SQL="SELECT Serie,Modelo FROM "+ dbInsumos.TABLE+ " WHERE nPedido='"+npedido+"';";
+        Cursor resp=db.rawQuery( SQL,null);
+
+        for(int i=0;i<resp.getCount();i++)
+        {
+            if(resp.moveToPosition( i ))
+            {
+                insumos=new ListInsumo();
+                insumos.setNumSerie(resp.getString(0));
+                insumos.setModelo(resp.getString( 1));
+                list.add(insumos);
+            }
+        }
+        adapter=new AdapterInsumos(InsumosSubItem.this,list,2);
+        recyclerView.setAdapter(adapter);
+        db.close();
+        Search();
     }
 
 }

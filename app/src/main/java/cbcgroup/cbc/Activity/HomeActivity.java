@@ -1,6 +1,7 @@
 package cbcgroup.cbc.Activity;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -30,6 +31,7 @@ import cbcgroup.cbc.Fragment.InsumosFragment;
 import cbcgroup.cbc.Fragment.ListTecnicosSuperAdmin;
 import cbcgroup.cbc.Fragment.WebDct;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,InsumosFragment.OnFragmentInteractionListener,HomeFragment.OnFragmentInteractionListener,ListTecnicosSuperAdmin.OnFragmentInteractionListener,WebDct.OnFragmentInteractionListener{
@@ -42,6 +44,7 @@ public class HomeActivity extends AppCompatActivity
     private TextView edtNombreMenu,edtEmailMenu;
     private CBC cbc;
     private boolean webUse=false,fragmentUse=true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -52,6 +55,8 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         Home();
         cbc= new CBC(HomeActivity.this);
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById( R.id.fab );
         fab.setOnClickListener( new View.OnClickListener() {

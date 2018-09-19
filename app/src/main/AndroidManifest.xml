@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -13,9 +14,12 @@
         android:roundIcon="@mipmap/ic_cbc"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
-        <activity android:name=".Activity.LoginActivity" >
+
+        <activity android:name=".Activity.LoginActivity"
+            android:configChanges="screenSize|orientation"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -31,6 +35,11 @@
         <activity android:name=".Activity.TecnicosActivity" />
         <activity android:name=".Activity.TecnicosOut" >
         </activity>
+        <receiver android:name=".Clases.NetWorkStateChecker">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

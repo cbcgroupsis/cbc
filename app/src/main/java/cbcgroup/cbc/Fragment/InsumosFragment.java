@@ -2,6 +2,8 @@ package cbcgroup.cbc.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,88 +31,47 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
+import cbcgroup.cbc.Activity.TecnicosOut;
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.Insumos.AdapterInsumos;
 import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
+import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link InsumosFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link InsumosFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class InsumosFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
+public class InsumosFragment extends Fragment
+{
     private OnFragmentInteractionListener mListener;
     public static final String TAG = "TecnicosSuperAdmin_Fragment";
-    private String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/v14/insumos.php";
+    private String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/v14/prueba/insumosPrueba.php";
     private android.support.v7.widget.SearchView searchView;
     private RecyclerView recyclerView;
     ListInsumo insumos = new ListInsumo();
     AdapterInsumos adapter;
     CBC cbc;
+    /**db*/
+   private SQLite sql;
+   private ConnSQLiteHelper con;
 
-    public InsumosFragment() {
-        // Required empty public constructor
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment InsumosFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static InsumosFragment newInstance(String param1, String param2) {
-        InsumosFragment fragment = new InsumosFragment();
-        Bundle args = new Bundle();
-        args.putString( ARG_PARAM1, param1 );
-        args.putString( ARG_PARAM2, param2 );
-        fragment.setArguments( args );
-        return fragment;
-    }
-
+    public InsumosFragment() { }
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState );
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString( ARG_PARAM1 );
-            mParam2 = getArguments().getString( ARG_PARAM2 );
-        }
-    }
-
+    public void onCreate(Bundle savedInstanceState){super.onCreate( savedInstanceState );}
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view= inflater.inflate( R.layout.fragment_insumos, container, false );
+        con =  new ConnSQLiteHelper( getContext(),"bdtecSinInternet",null, 1);
+        sql = new SQLite();
         searchView=view.findViewById( R.id.mSearch );
         recyclerView=view.findViewById( R.id.myRecycler );
         recyclerView.setLayoutManager( new LinearLayoutManager( getActivity() ) );
         recyclerView.setItemAnimator( new DefaultItemAnimator() );
         cbc=new CBC(getActivity());
-        Programa();
+        if(cbc.Internet()) Programa();
+        else ProgramaSinConexion();
         return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction( uri );
-        }
     }
 
     @Override
@@ -130,16 +91,6 @@ public class InsumosFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -159,12 +110,17 @@ public class InsumosFragment extends Fragment {
                 insumos=new ListInsumo();
                 insumos.setNumPedido(obj.getString( "npedido" ));
                 insumos.setNombreCliente(obj.getString( "cliente" ));
+                SincronizarDbLocal(obj.getString( "npedido" ),obj.getString( "cliente" ),obj.getString( "serie"),obj.getString( "modelo" ) );
                 list.add(insumos);
             }
+     //     ProgramaSinConexion();
+
             adapter=new AdapterInsumos(getActivity(),list,1);
             recyclerView.setAdapter(adapter);
-        } catch (JSONException e) {
+        } catch (JSONException e)
+        {
             e.printStackTrace();
+            ProgramaSinConexion();
         }
     }
 
@@ -197,6 +153,8 @@ public class InsumosFragment extends Fragment {
                     @Override
                     public void onResponse(String s)
                     {
+                        SQLiteDatabase db=con.getWritableDatabase();
+                        sql.DeleteTabla( db,dbInsumos.TABLE );
                         cbc.progressDialogCancel();
                         Log.w(TAG,"Resp:"+s);
                         List( s );
@@ -216,6 +174,8 @@ public class InsumosFragment extends Fragment {
                 })
         {
 
+
+
             @Override
             protected Map<String, String> getParams()
             {
@@ -227,6 +187,42 @@ public class InsumosFragment extends Fragment {
 
         };
         requestQueue.add(stringRequest);
+    }
+
+    private void SincronizarDbLocal(String nPedido,String cliente,String serie,String modelo)
+    {
+        SQLiteDatabase db=con.getWritableDatabase();
+        Map params = new Hashtable(  );
+        params.clear();
+        params.put( dbInsumos.CAMPO_NPEDIDO,nPedido);
+        params.put(dbInsumos.CAMPO_Cliente,cliente);
+        params.put(dbInsumos.CAMPO_SERIE,serie);
+        params.put(dbInsumos.CAMPO_MODELO,modelo);
+        sql.Add(db,dbInsumos.TABLE,params);
+
+    }
+    private void ProgramaSinConexion()
+    {
+        Toast.makeText( getContext(),"Usted esta trabajando sin conexion",Toast.LENGTH_LONG ).show();
+        final ArrayList<ListInsumo> list=new ArrayList<>();
+        list.clear();
+        SQLiteDatabase db = con.getWritableDatabase();
+        String SQL="SELECT nPedido,Cliente FROM "+ dbInsumos.TABLE+" GROUP BY nPedido,Cliente";
+        Cursor resp=db.rawQuery( SQL,null);
+        for(int i=0;i<resp.getCount();i++)
+        {
+            if(resp.moveToPosition( i ))
+            {
+                insumos=new ListInsumo();
+                insumos.setNumPedido(resp.getString(0));
+                insumos.setNombreCliente(resp.getString( 1 ));
+                list.add(insumos);
+            }
+        }
+        adapter=new AdapterInsumos(getActivity(),list,1);
+        recyclerView.setAdapter(adapter);
+        db.close();
+        Search();
     }
 }
 

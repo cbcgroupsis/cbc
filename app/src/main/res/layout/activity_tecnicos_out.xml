@@ -128,7 +128,7 @@
                             android:background="@drawable/rounded_textviewa"
                             android:gravity="center"
                             android:inputType="textMultiLine"
-                            android:text="0" />
+                            android:hint="0" />
 
                         <TextView
                             android:layout_width="200px"
@@ -147,7 +147,7 @@
                             android:background="@drawable/rounded_textviewa"
                             android:gravity="center"
                             android:inputType="textMultiLine"
-                            android:text="0" />
+                            android:hint="0" />
 
                         <TextView
                             android:layout_width="200px"
