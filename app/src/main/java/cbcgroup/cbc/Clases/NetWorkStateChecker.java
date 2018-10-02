@@ -47,7 +47,7 @@ public class NetWorkStateChecker extends BroadcastReceiver {
 
         this.context = context;
 
-        con =  new ConnSQLiteHelper( context,"bdtecSinInternet",null, 1);
+        con =  new ConnSQLiteHelper(context);
         sql = new SQLite();
         cbc = new CBC(context);
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

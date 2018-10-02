@@ -6,6 +6,16 @@ public class ListInsumo
     String nombreCliente;
     String numSerie;
     String modelo;
+    String oneDate;
+    String idTec;
+    public String getIdTec() {
+        return idTec;
+    }
+
+    public void setIdTec(String idTec) {
+        this.idTec = idTec;
+    }
+
 
     public String getOneDate() {
         return oneDate;
@@ -15,7 +25,7 @@ public class ListInsumo
         this.oneDate = oneDate;
     }
 
-    String oneDate;
+
     public String getNumPedido() {
         return numPedido;
     }

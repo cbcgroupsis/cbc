@@ -18,13 +18,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.system.ErrnoException;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +53,7 @@ import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
 import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
+import cbcgroup.cbc.dbLocal.Tablas.dbTecnicos;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -61,12 +65,13 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     private String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
     private String URLIMAGEN = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
     private TextView serie,sector,fecha,modelo,fechaVencimiento;
-    private EditText tareaRealizada,copias,copiasColor,viaje;
+    private EditText tareaRealizada,copias,copiasColor,viajeHora,viajeMinutos;
     private ImageButton imgTec;
     private Button button;
     private String nombre;
     private Bundle extra;
     private CBC cbc;
+    private LinearLayout  linearLayout;
 
     //////////////////Sacar fotos /////////////////
     private ContentValues values;
@@ -85,24 +90,27 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_tecnicos_out );
         modelo=findViewById( R.id.tec_modelo );
+        modelo.setMovementMethod(new ScrollingMovementMethod());
         serie=findViewById( R.id.tec_subItem_serie );
         sector=findViewById( R.id.tec_subItem_sector);
         fecha=findViewById( R.id.tec_subItem_fecha);
         tareaRealizada=findViewById( R.id.tarea_realizada);
         copias=findViewById( R.id.contador );
         copiasColor=findViewById( R.id.contadorColor );
-        viaje=findViewById( R.id.Tviaje );
+        viajeHora=findViewById( R.id.TviajeHora );
+        viajeMinutos=findViewById( R.id.TviajeMinutos );
         button=findViewById( R.id.cerrarPedido );
         fechaVencimiento=findViewById( R.id.tec_subItem_fechaVencimiento );
+        linearLayout=findViewById( R.id.linearLayoutTecnicos );
         imgTec=findViewById( R.id.imgTecnico );
         button.setOnClickListener( this );
         imgTec.setOnClickListener( this );
+        linearLayout.setOnClickListener( this );
         cbc= new CBC(TecnicosOut.this);
-        con =  new ConnSQLiteHelper( TecnicosOut.this,"bdtecSinInternet",null, 1);
+        con =  new ConnSQLiteHelper( this);
         sql = new SQLite();
         extra=getIntent().getExtras();
-        if(cbc.Internet()) completeInfo();
-        else Toast.makeText( this,"NO TIENE ACCESO A INTERNET O SU CONNCECION ES MUY LENTA, VUELVA ATRAS Y INTENTE NUEVAMENTE",Toast.LENGTH_LONG ).show();
+        CompleteInfo();
     }
 
     @Override
@@ -110,14 +118,13 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     {
         if(v==button)
         {
-            if(tareaRealizada.length()>=5)
+            if(!tareaRealizada.getText().toString().matches( "" ))
             {
                 if (copiasColor.getText().toString().matches( "" )) copiasColor.setText( "0" );
                 if (copias.getText().toString().matches( "" )) copias.setText( "0" );
-                if (!viaje.getText().toString().matches( "" ))
+                if (!viajeHora.getText().toString().matches( "" ) && !viajeHora.getText().toString().matches( "" ) && AlertHoraInvalido())
                 {
-                    if(cbc.Internet())
-                    {
+
                         if(thumbnail==null)
                         {
 
@@ -144,10 +151,10 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                             });
                             AlertDialog alertDialog=alertDialogBuilder.create();
                             alertDialog.show();
-                        } else  CerrarPedido();
-                    }else GuardarInformacion();
+
+                    }else CerrarPedido();
                 } else
-                    Toast.makeText( this, "Ingrese el Tiempo de viaje", Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( this, "El Tiempo de viaje ingresado es incorrecto", Toast.LENGTH_SHORT ).show();
             }else Toast.makeText( this, "Ingrese la tarea realizada", Toast.LENGTH_SHORT ).show();
         }
 
@@ -158,7 +165,26 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
             if(Permisos())SacarFoto();
 
         }
+       if(linearLayout==v)
+        {
+            View view = this.getCurrentFocus();
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(LoginActivity.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
     }
+
+    private boolean AlertHoraInvalido()
+    {
+        int hora,minutos;
+        try {
+            hora = Integer.parseInt( viajeHora.getText().toString() );
+            minutos = Integer.parseInt( viajeMinutos.getText().toString() );
+        }catch (Exception e){hora=70;minutos=70;}
+        return hora <= 60 && minutos <= 60;
+    }
+
     void completeInfo()
     {
         cbc.progressDialog( "Cargando Informacion...","Espere por favor." );
@@ -176,7 +202,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                             JSONObject response= new JSONObject( s );
                             JSONArray tecSubItem= response.getJSONArray( "hoja_reparacion" );
                             JSONObject obj=tecSubItem.getJSONObject(0 );
-                            modelo.setText(obj.getString( "modelo" ));
+                            modelo.setText(obj.getString("modelo"));
                             serie.setText(obj.getString( "serie" ));
                             sector.setText(obj.getString( "sector" ));
                             fecha.setText(obj.getJSONObject( "fecha" ).getString("date"));
@@ -215,6 +241,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
 
     void CerrarPedido()
     {
+
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,AlertDialog.THEME_HOLO_DARK);
         alertDialogBuilder.setMessage("Desea Cerrar el pedido tecnico?");
         alertDialogBuilder.setCancelable(false);
@@ -224,7 +251,10 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
             public void onClick(DialogInterface dialog, int which)
 
             {
-                regresoQuery();
+                if(cbc.Internet()) regresoQuery();
+               else  GuardarInformacion();
+
+               Salida();
 
             }
         });
@@ -280,7 +310,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                 params.put("mensaje",tareaRealizada.getText().toString());
                 params.put("copias",copias.getText().toString());
                 params.put("copiasColor",copiasColor.getText().toString());
-                params.put("viaje",viaje.getText().toString());
+                params.put("viaje",viajeHora.getText().toString()+":"+viajeMinutos.getText().toString());
 
 
                 Log.w(TAG,params.get( "id_tecnico" ));
@@ -484,7 +514,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         params.put(dbTecSinInternet.CAMPO_MENSAJE,tareaRealizada.getText().toString());
         params.put(dbTecSinInternet.CAMPO_COPIAS,copias.getText().toString());
         params.put(dbTecSinInternet.CAMPO_COPIASCOLOR,copiasColor.getText().toString());
-        params.put(dbTecSinInternet.CAMPO_TVIAJE,viaje.getText().toString());
+        params.put(dbTecSinInternet.CAMPO_TVIAJE,viajeHora.getText().toString()+":"+viajeMinutos.getText().toString());
         params.put(dbTecSinInternet.CAMPO_ESPERA,"1");
 
         Log.w(TAG,"id_tec->"+params.get( "id_tecnico" ));
@@ -499,4 +529,49 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         sql.Add(db, dbTecSinInternet.TABLE,params);
         startActivity( new Intent(TecnicosOut.this,HomeActivity.class ).putExtra( "homeStart","homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ));
     }
+
+    void CompleteInfo()
+    {
+        String nparte= extra.getString( "npedido" );
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="SELECT nParte,Cliente,nSerie,Sector,FechaVence,Fecha,Modelo,Inconveniente,Ingreso FROM "+ dbTecnicos.TABLE+ " WHERE nParte='"+nparte+"'";
+        Cursor resp=db.rawQuery( SQL,null);
+        if(resp.moveToPosition( 0))
+        {
+            serie.setText(resp.getString(2));
+            sector.setText(resp.getString(3));
+            fechaVencimiento.setText(resp.getString(4) );
+            fecha.setText(resp.getString(5));
+            modelo.setText(resp.getString(6));
+
+            Log.w("LISTATEST","ingreso->"+resp.getString(8));
+            if(!resp.getString( 8 ).equals( "" ))
+            {
+                Log.w("LISTATEST","ingreso->VALOR NO NULL");
+            }else Log.w("LISTATEST","ingreso->VALOR NULL");
+
+
+        }
+
+        db.close();
+        Log.w(TAG,"INFORMACION COMPELTADA POR DB");
+    }
+
+    private void Salida()
+    {
+        String nparte= extra.getString( "npedido" );
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="UPDATE "+dbTecnicos.TABLE+" SET Ingreso='' WHERE nParte='"+ nparte+"'";
+        try
+        {
+            db.execSQL( SQL );
+        }catch (Exception e)
+        {
+            Log.w("LSITATEST","error->"+e.toString());
+        }
+
+        db.close();
+    }
 }
+//Antes los tecnicos levantaban los biaticos, natalia en el cac los aprobabas, y cuando ella lo aprobaba le leggaba u mail a Marcelo... Ese mail no le esta llegadndo, le esta llegando a analia sin la aprobacion de marcelo.
+//parte de biatico no aparece nada.

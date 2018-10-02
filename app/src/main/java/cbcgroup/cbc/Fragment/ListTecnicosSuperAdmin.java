@@ -43,17 +43,9 @@ import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ListTecnicosSuperAdmin.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ListTecnicosSuperAdmin#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class ListTecnicosSuperAdmin extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -110,7 +102,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate( R.layout.fragment_list_tecnicos_super_admin, container, false );
-        con =  new ConnSQLiteHelper( getContext(),"bdtecSinInternet",null,1 );
+        con =  new ConnSQLiteHelper( getContext());
         sql = new SQLite();
         searchView=view.findViewById( R.id.mSearch );
         recyclerView=view.findViewById( R.id.myRecycler );
@@ -157,17 +149,6 @@ public class ListTecnicosSuperAdmin extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -186,7 +167,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
                 JSONObject obj=jsonInsumos.getJSONObject( a );
                 insumos=new ListInsumo();
                 insumos.setOneDate(obj.getString( "nombre" ));
-                SincronizarDbLocal( obj.getString( "nombre" ));
+                SincronizarDbLocal( obj.getString( "nombre" ),obj.getString( "idTecnico" ));
                 list.add(insumos);
             }
             adapter=new AdapterInsumos(getActivity(),list,3);
@@ -250,20 +231,19 @@ public class ListTecnicosSuperAdmin extends Fragment {
             protected Map<String, String> getParams()
             {
                 Map<String, String> params = new Hashtable<>();
-                params.put("Content-Type","application/json; charset=utf-8");
-                //     params.put("dato",getActivity().getIntent().getExtras().getString( "npedido" ));
                 return params;
             }
 
         };
         requestQueue.add(stringRequest);
     }
-    private void SincronizarDbLocal(String nombres)
+    private void SincronizarDbLocal(String nombres,String idTec)
     {
         SQLiteDatabase db=con.getWritableDatabase();
         Map params = new Hashtable(  );
         params.clear();
         params.put(dbNombresTecSa.CAMPO_NOMBRES,nombres);
+        params.put(dbNombresTecSa.CAMPO_IDTEC,idTec);
         sql.Add(db,dbNombresTecSa.TABLE,params);
 
     }
@@ -271,7 +251,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
     {
         final ArrayList<ListInsumo> list=new ArrayList<>();
         list.clear();
-        SQLiteDatabase db = con.getWritableDatabase();
+        SQLiteDatabase db = con.getReadableDatabase();
         String SQL="SELECT * FROM "+ dbNombresTecSa.TABLE;
         Cursor resp=db.rawQuery( SQL,null);
         Log.w("LIST","lista:"+resp.getCount());
@@ -281,6 +261,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
             {
                 insumos=new ListInsumo();
                 insumos.setOneDate(resp.getString(0));
+
                 list.add(insumos);
                 Log.w("LIST","lista:"+resp.getString(0));
             }
@@ -309,4 +290,5 @@ public class ListTecnicosSuperAdmin extends Fragment {
             return false;
         }else return true;
     }
+    //
 }

@@ -84,7 +84,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         btnEnviar.setOnClickListener( this );
         imgInsumos.setOnClickListener( this );
         cbc = new CBC(CamActivity.this);
-        con =  new ConnSQLiteHelper( this,"bdtecSinInternet",null, 1);
+        con =  new ConnSQLiteHelper( this);
         sql = new SQLite();
         CargarInfo();
 
@@ -97,6 +97,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         {
             Log.w(TAG,"btnCam funciona");
             SubirImagen();
+
 
         }
         if(v==imgInsumos)
@@ -190,7 +191,36 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
                         }
 
                     }
+
+                    /***/
                 }
+                break;
+            case 0:
+                if (requestCode == 0) {
+
+                    // si tout s'est bien passee
+                    if (resultCode == CamActivity.RESULT_OK) {
+
+                        // contents est la valeur contenue dans notre code barre ou QR
+
+                        String contents = data.getStringExtra("SCAN_RESULT");
+
+                        Toast.makeText(this,"Valeur decryptee : "+contents, Toast.LENGTH_LONG).show();
+                        Log.w(TAG,contents);
+
+                    }
+
+                    // si operation annulee
+                    if(resultCode == CamActivity.RESULT_CANCELED){
+
+                        Toast.makeText(this,"Operation annulee", Toast.LENGTH_LONG).show();
+
+                    }
+
+                }
+                break;
+
+
         }
     }
 

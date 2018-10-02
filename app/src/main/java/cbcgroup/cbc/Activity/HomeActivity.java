@@ -37,9 +37,7 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,InsumosFragment.OnFragmentInteractionListener,HomeFragment.OnFragmentInteractionListener,ListTecnicosSuperAdmin.OnFragmentInteractionListener,WebDct.OnFragmentInteractionListener{
 
 
-    private static final String TAG = "HomeActivity" ;
-    //private FirebaseAuth firebaseAuth;
-    //private FirebaseAuth.AuthStateListener authStateListener;
+    private static final String TAG = "TAG_HomeActivity";
     private NavigationView navigationView ;
     private TextView edtNombreMenu,edtEmailMenu;
     private CBC cbc;
@@ -55,8 +53,6 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         Home();
         cbc= new CBC(HomeActivity.this);
-
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById( R.id.fab );
         fab.setOnClickListener( new View.OnClickListener() {
@@ -121,7 +117,7 @@ public class HomeActivity extends AppCompatActivity
         /******************* Tecnicos *************************/
         else if(id==R.id.tecnicos_tecnicos)
         {
-            if(cbc.getdUserSector().equals( "super admin" ) || cbc.getdUserSector().equals( "direccion") ||  cbc.getdUserSector().equals( "comercial"))TecnicosFragment();
+            if(cbc.getdUserSector().equals( "super admin" ) || cbc.getdUserSector().equals( "direccion") ||  cbc.getdUserSector().equals( "comercial") || cbc.getdUserSector().equals( "supervisor tecnico") )TecnicosFragment();
             else startActivity( new Intent( HomeActivity.this,TecnicosActivity.class ));
         }
         /******************* Cliente  ************************/
@@ -312,12 +308,18 @@ public class HomeActivity extends AppCompatActivity
         transition.commit();
     }
 
-    void Home()
+    private void Home()
     {
 
         webUse=false;
         fragmentUse=false;
+
         HomeFragmento();
+    }
+
+    private void UltimoInicioDeSesion()
+    {
+        Log.w(TAG,"ultimoInicioDeSesion");
     }
 
     @Override
@@ -344,7 +346,6 @@ public class HomeActivity extends AppCompatActivity
 
 
         }
-        Log.w(TAG,"AFUUERA AFUERA");
         return false;
      /*   if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (keyCode) {

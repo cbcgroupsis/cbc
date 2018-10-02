@@ -15,9 +15,12 @@
         android:orientation="vertical"
         android:weightSum="1"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteY="0dp"
+        android:id="@+id/linearLayoutTecnicos"
+        tools:ignore="MissingConstraints">
 
         <LinearLayout
+
             android:layout_width="300dp"
             android:layout_height="match_parent"
             android:layout_weight="0.9"
@@ -26,10 +29,12 @@
             <TextView
                 android:id="@+id/tec_modelo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
+                android:textSize="30dp"
                 android:layout_gravity="center"
                 android:textColor="#FFFFFF"
-                android:textSize="30dp" />
+                android:scrollbars="vertical"
+                 />
 
             <TextView
                 android:layout_width="match_parent"
@@ -127,7 +132,7 @@
                             android:autoSizeTextType="uniform"
                             android:background="@drawable/rounded_textviewa"
                             android:gravity="center"
-                            android:inputType="textMultiLine"
+                            android:inputType="numberDecimal"
                             android:hint="0" />
 
                         <TextView
@@ -146,7 +151,7 @@
                             android:autoSizeTextType="uniform"
                             android:background="@drawable/rounded_textviewa"
                             android:gravity="center"
-                            android:inputType="textMultiLine"
+                            android:inputType="numberDecimal"
                             android:hint="0" />
 
                         <TextView
@@ -155,18 +160,46 @@
                             android:text="T. de viaje:"
                             android:textColor="#ffffff" />
 
-                        <EditText
-                            android:id="@+id/Tviaje"
-                            android:layout_width="200px"
-                            android:layout_height="50px"
-                            android:autoSizeMaxTextSize="100sp"
-                            android:autoSizeMinTextSize="1sp"
-                            android:autoSizeStepGranularity="1sp"
-                            android:autoSizeTextType="uniform"
-                            android:background="@drawable/rounded_textviewa"
-                            android:gravity="center"
-                            android:hint="hh:mm"
-                            android:inputType="datetime" />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="1">
+                            <EditText
+                                android:layout_weight="0.5"
+                                android:id="@+id/TviajeHora"
+                                android:layout_width="90px"
+                                android:layout_height="50px"
+                                android:autoSizeMaxTextSize="100sp"
+                                android:autoSizeMinTextSize="1sp"
+                                android:autoSizeStepGranularity="1sp"
+                                android:autoSizeTextType="uniform"
+                                android:background="@drawable/rounded_textviewa"
+                                android:gravity="center"
+                                android:hint="hh"
+                                android:inputType="datetime"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=":"
+                                android:textColor="#ffffff" />
+                            <EditText
+                                android:layout_weight="0.5"
+                                android:id="@+id/TviajeMinutos"
+                                android:layout_width="90px"
+                                android:layout_height="50px"
+                                android:autoSizeMaxTextSize="100sp"
+                                android:autoSizeMinTextSize="1sp"
+                                android:autoSizeStepGranularity="1sp"
+                                android:autoSizeTextType="uniform"
+                                android:background="@drawable/rounded_textviewa"
+                                android:gravity="center"
+                                android:hint="mm"
+                                android:inputType="datetime"/>
+
+
+                        </LinearLayout>
+
 
                     </LinearLayout>
                     <!-- der -->
@@ -179,7 +212,7 @@
                         <TextView
                             android:layout_width="200px"
                             android:layout_height="wrap_content"
-                            android:text="T. de viaje:"
+                            android:text="Foto:"
                             android:textColor="#ffffff" />
                         <ImageButton
                             android:id="@+id/imgTecnico"

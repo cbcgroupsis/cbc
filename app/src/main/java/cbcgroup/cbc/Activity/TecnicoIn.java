@@ -3,8 +3,11 @@ package cbcgroup.cbc.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +29,13 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import cbcgroup.cbc.Clases.CBC;
+import cbcgroup.cbc.Insumos.AdapterInsumos;
+import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
+import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
+import cbcgroup.cbc.dbLocal.Tablas.dbTecnicos;
 
 public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
 {
@@ -38,12 +47,15 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
     String nombre;
     Bundle extra;
     CBC cbc;
+    private SQLite sql;
+    private ConnSQLiteHelper con;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_tecnico_in );
         modelo=findViewById( R.id.tec_modelo );
+        modelo.setMovementMethod(new ScrollingMovementMethod());
         serie=findViewById( R.id.tec_subItem_serie );
         sector=findViewById( R.id.tec_subItem_sector);
         fecha=findViewById( R.id.tec_subItem_fecha);
@@ -52,9 +64,10 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         fechaVencimiento=findViewById( R.id.tec_subItem_fechaVencimiento );
         button.setOnClickListener( this );
         cbc= new CBC(TecnicoIn.this);
+        con =  new ConnSQLiteHelper( this);
+        sql = new SQLite();
         extra=getIntent().getExtras();
-        if(cbc.Internet()) completeInfo();
-        else Toast.makeText( this,"NO TIENE ACCESO A INTERNET O SU CONNCECION ES MUY LENTA, VUELVA ATRAS Y INTENTE NUEVAMENTE",Toast.LENGTH_LONG ).show();
+        CompleteInfo();
     }
 
     @Override
@@ -65,64 +78,6 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
             IngresoPedido();
         }
     }
-
-    void completeInfo()
-    {
-        cbc.progressDialog( "Cargando Informacion...","Espere por favor..." );
-        RequestQueue requestQueue = Volley.newRequestQueue(TecnicoIn.this);
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
-                new Response.Listener<String>()
-                {
-                    @Override
-                    public void onResponse(String s)
-                    {
-                        cbc.progressDialogCancel();
-                        Log.w(TAG,"Resp:"+s);
-                        try
-                        {
-                            JSONObject response= new JSONObject( s );
-                            JSONArray tecSubItem= response.getJSONArray( "hoja_reparacion" );
-                            JSONObject obj=tecSubItem.getJSONObject(0 );
-                            modelo.setText(obj.getString( "modelo" ));
-                            serie.setText(obj.getString( "serie" ));
-                            sector.setText(obj.getString( "sector" ));
-                            fecha.setText(obj.getJSONObject( "fecha" ).getString("date"));
-                            fechaVencimiento.setText(obj.getJSONObject( "fechaVence" ).getString("date") );
-                            inconveniente.setText(obj.getString( "inconveniente" ) );
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError)
-                    {
-                        cbc.progressDialogCancel();
-                        Log.i( TAG,volleyError.toString());
-                        Toast.makeText( TecnicoIn.this, "Error: "+volleyError.toString(), Toast.LENGTH_SHORT ).show();
-                    }
-                })
-        {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String> params = new Hashtable<>();
-                if(cbc.getdUserSector().equals( "super admin" )) nombre=extra.getString( "nameTecSa" );
-                else nombre=cbc.getdUserName();
-                params.put("Content-Type","application/json; charset=utf-8");
-                params.put("name_tec",nombre );
-                params.put("id_parte", extra.getString( "npedido" ));
-                return params;
-            }
-
-        };
-        requestQueue.add(stringRequest);
-    }
-
 
     void IngresoPedido()
     {
@@ -135,7 +90,9 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
             public void onClick(DialogInterface dialog, int which)
 
             {
+                Ingreso();
                 ingresoQuery();
+
 
             }
         });
@@ -160,8 +117,8 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
                     @Override
                     public void onResponse(String s)
                     {
-                        cbc.setIngresoTecnico(true);
-                        cbc.setIngresonpedido( extra.getString( "npedido" ));
+                        //cbc.setIngresoTecnico(true);
+                        //cbc.setIngresonpedido( extra.getString( "npedido" ));
                         Toast.makeText( TecnicoIn.this, "Se ingreso correctamente!", Toast.LENGTH_SHORT ).show();
                         startActivity( new Intent(TecnicoIn.this,HomeActivity.class ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP ));
                     }
@@ -190,6 +147,48 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
 
         };
         requestQueue.add(stringRequest);
+    }
+
+    void CompleteInfo()
+    {
+        String nparte= extra.getString( "npedido" );
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="SELECT nParte,Cliente,nSerie,Sector,FechaVence,Fecha,Modelo,Inconveniente,Ingreso FROM "+ dbTecnicos.TABLE+ " WHERE nParte='"+nparte+"'";
+        Cursor resp=db.rawQuery( SQL,null);
+        if(resp.moveToPosition( 0))
+        {
+            serie.setText(resp.getString(2));
+            sector.setText(resp.getString(3));
+            fechaVencimiento.setText(resp.getString(4) );
+            fecha.setText(resp.getString(5));
+            modelo.setText(resp.getString(6));
+            inconveniente.setText(resp.getString(7) );
+
+            Log.w("LISTATEST","ingreso->"+resp.getString(8));
+            if(!resp.getString( 8 ).equals( "" ))
+            {
+                Log.w("LISTATEST","ingreso->VALOR NO NULL");
+            }else Log.w("LISTATEST","ingreso->VALOR NULL");
+
+
+        }
+
+        db.close();
+    }
+    private void Ingreso()
+    {
+        String nparte= extra.getString( "npedido" );
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="UPDATE "+dbTecnicos.TABLE+" SET Ingreso='1' WHERE nParte='"+ nparte+"'";
+        try
+        {
+            db.execSQL( SQL );
+        }catch (Exception e)
+        {
+            Log.w("LSITATEST","error->"+e.toString());
+        }
+
+        db.close();
     }
 
 }

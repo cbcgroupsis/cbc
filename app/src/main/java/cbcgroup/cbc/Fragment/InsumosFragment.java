@@ -62,7 +62,7 @@ public class InsumosFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view= inflater.inflate( R.layout.fragment_insumos, container, false );
-        con =  new ConnSQLiteHelper( getContext(),"bdtecSinInternet",null, 1);
+        con =  new ConnSQLiteHelper( getContext());
         sql = new SQLite();
         searchView=view.findViewById( R.id.mSearch );
         recyclerView=view.findViewById( R.id.myRecycler );
@@ -206,7 +206,7 @@ public class InsumosFragment extends Fragment
         Toast.makeText( getContext(),"Usted esta trabajando sin conexion",Toast.LENGTH_LONG ).show();
         final ArrayList<ListInsumo> list=new ArrayList<>();
         list.clear();
-        SQLiteDatabase db = con.getWritableDatabase();
+        SQLiteDatabase db = con.getReadableDatabase();
         String SQL="SELECT nPedido,Cliente FROM "+ dbInsumos.TABLE+" GROUP BY nPedido,Cliente";
         Cursor resp=db.rawQuery( SQL,null);
         for(int i=0;i<resp.getCount();i++)

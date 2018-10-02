@@ -1,11 +1,16 @@
 package cbcgroup.cbc.Activity;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -27,17 +32,26 @@ import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.Insumos.AdapterInsumos;
 import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
+import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
+import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
+import cbcgroup.cbc.dbLocal.Tablas.dbTecnicos;
 
 public class TecnicosActivity  extends AppCompatActivity
 {
 
-    String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/hoja_de_reparacion.php?";
+    private String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/prueba/servicioTecnico.php";
     private android.support.v7.widget.SearchView searchView;
     private RecyclerView recyclerView;
-    ListInsumo insumos = new ListInsumo();
-    AdapterInsumos adapter;
-    CBC cbc;
+    private ListInsumo insumos = new ListInsumo();
+    private AdapterInsumos adapter;
+    private ImageButton actualizar;
+    private CBC cbc;
+    private SQLite sql;
+    private ConnSQLiteHelper con;
     private String TAG="Tecnicos";
+    private String idTec="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +59,34 @@ public class TecnicosActivity  extends AppCompatActivity
         setContentView( R.layout.activity_tecnicos );
         searchView=findViewById( R.id.mSearch );
         recyclerView=findViewById( R.id.myRecycler );
+        actualizar=findViewById( R.id.actualizar );
         recyclerView.setLayoutManager( new LinearLayoutManager( TecnicosActivity.this ) );
         recyclerView.setItemAnimator( new DefaultItemAnimator() );
+        con =  new ConnSQLiteHelper( this);
+        sql = new SQLite();
         cbc=new CBC(TecnicosActivity.this);
-        if(cbc.Internet()) Programa();
-        else Toast.makeText( this,"NO TIENE ACCESO A INTERNET O SU CONNCECION ES MUY LENTA, VUELVA ATRAS Y INTENTE NUEVAMENTE",Toast.LENGTH_LONG ).show();
+        if(TableValues()) Programa();
+        else ProgramaSinConexion();
+        actualizar.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                if(cbc.Internet())Programa();
+                else Toast.makeText( TecnicosActivity.this,"No tiene Acceso Internet para Actualizar la Lista",Toast.LENGTH_LONG ).show();
+            }
+        } );
+
+        ////////////////////
+        /*if(cbc.Internet()) Programa();
+        else{
+            Toast.makeText( this,"Usted esta trabajando sin conexion",Toast.LENGTH_LONG ).show();
+            ProgramaSinConexion();
+        }*/
     }
+    //Configuracion pcl, tipo de fuente, pagina etc
+
+
+
     void List(String  res)
     {
         final ArrayList<ListInsumo> list=new ArrayList<>();
@@ -58,14 +94,26 @@ public class TecnicosActivity  extends AppCompatActivity
         try {
             JSONObject response = new JSONObject( res );
             JSONArray jsonInsumos = response.getJSONArray( "lista_de_hoja_reparacion" );
+            SQLiteDatabase db=con.getWritableDatabase();
             for(int a=0;a<jsonInsumos.length();a++)
             {
                 JSONObject obj=jsonInsumos.getJSONObject( a );
+
+                String npedido=obj.getString( "idparte" );
+                String inconveniente=obj.getString( "inconveniente" );
+                String fVence=obj.getString( "fechaVence" );
+                String fecha=obj.getString( "fecha" );
+                String cliente=obj.getString( "cliente" );
+                String modelo=obj.getString( "modelo" );
+                String nSerie=obj.getString( "serie" );
+                String sector= obj.getString( "sector" );
+                String ingreso=obj.getString("ingreso");
+                SincronizarDbLocal(npedido,cliente,nSerie,sector,fVence,fecha,ingreso,modelo,inconveniente);
                 insumos=new ListInsumo();
-                insumos.setNumPedido(obj.getString( "idparte" ));
-                insumos.setNombreCliente(obj.getString( "cliente" ));
-                Log.w(TAG,"Resss:"+obj.get( "idparte" ));
+                insumos.setNumPedido(npedido);
+                insumos.setNombreCliente( cliente );
                 list.add(insumos);
+
             }
             adapter=new AdapterInsumos(TecnicosActivity.this,list,4);
             recyclerView.setAdapter(adapter);
@@ -93,14 +141,16 @@ public class TecnicosActivity  extends AppCompatActivity
 
     void Programa()
     {
-
         cbc.progressDialog( "Cargando Pedidos Tecnicos...","Espere por favor..." );
         Bundle extra= getIntent().getExtras();
-        String nameTec="";
-        if(extra!=null) nameTec=extra.getString( "nombreTecSa" );
-        else nameTec=cbc.getdUserName();
+
+        if(extra!=null)
+        {
+            idTec=extra.getString( "idTec" );
+        }
+        else idTec=cbc.getdUserId();
         RequestQueue requestQueue = Volley.newRequestQueue(TecnicosActivity.this);
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL+"name_tec="+cbc.spaceRemplace( nameTec,"%20" ),
+        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                 new Response.Listener<String>()
                 {
                     @Override
@@ -112,7 +162,9 @@ public class TecnicosActivity  extends AppCompatActivity
                         {
                             Toast.makeText( TecnicosActivity.this, "No hay pedidos tecnicos.", Toast.LENGTH_SHORT ).show(); finish();
                         }
-
+                        SQLiteDatabase db=con.getWritableDatabase();
+                        sql.DeleteTabla( db, dbTecnicos.TABLE );
+                        cbc.progressDialogCancel();
                         List( s );
                         Search();
                     }
@@ -132,13 +184,83 @@ public class TecnicosActivity  extends AppCompatActivity
             protected Map<String, String> getParams()
             {
                 Map<String, String> params = new Hashtable<>();
-                params.put("Content-Type","application/json; charset=utf-8");
-                //   params.put("name_tec",cbc.getdUserName());
+                params.put("idTec",idTec);
                 return params;
             }
 
         };
         requestQueue.add(stringRequest);
     }
+
+    /************** DB **************************/
+    private void ProgramaSinConexion()
+    {
+        Bundle extra= getIntent().getExtras();
+        if(extra!=null) idTec=extra.getString( "idTec" );
+        else idTec=cbc.getdUserId();
+        final ArrayList<ListInsumo> list=new ArrayList<>();
+        list.clear();
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="SELECT nParte,Cliente FROM "+ dbTecnicos.TABLE + " WHERE idTec='"+idTec+"'";
+        Cursor resp=db.rawQuery( SQL,null);
+        Log.w("LIST","lista:"+resp.getCount());
+        for(int i=0;i<resp.getCount();i++)
+        {
+            if(resp.moveToPosition( i ))
+            {
+                insumos=new ListInsumo();
+                insumos.setNumPedido(resp.getString( 0 ));
+                insumos.setNombreCliente( resp.getString( 1 ) );
+                list.add(insumos);
+
+            }
+        }
+        adapter=new AdapterInsumos(this,list,4);
+        recyclerView.setAdapter(adapter);
+        db.close();
+        Search();
+    }
+    private void SincronizarDbLocal(String nParte,String Cliente,String Serie,String Sector, String Fvence, String fecha, String Ingreso,String Modelo, String Inconveniente)
+    {
+        Bundle extra= getIntent().getExtras();
+        if(extra!=null) idTec=extra.getString( "idTec" );
+        else idTec=cbc.getdUserId();
+        SQLiteDatabase db=con.getWritableDatabase();
+        Map params = new Hashtable(  );
+        params.clear();
+        params.put( dbTecnicos.CAMPO_NPARTE,nParte);
+        params.put( dbTecnicos.CAMPO_CLIENTE,Cliente);
+        params.put( dbTecnicos.CAMPO_NSERIE,Serie);
+        params.put( dbTecnicos.CAMPO_SECTOR,Sector);
+        params.put( dbTecnicos.CAMPO_FECHAVENCE,Fvence);
+        params.put( dbTecnicos.CAMPO_FECHA,fecha);
+        params.put( dbTecnicos.CAMPO_INGRESO,Ingreso);
+        params.put( dbTecnicos.CAMPO_INCONVENIENTE,Inconveniente);
+        params.put( dbTecnicos.CAMPO_MODELO,Modelo);
+        params.put(dbTecnicos.CAMPO_IDTEC,idTec);
+        sql.Add(db,dbTecnicos.TABLE,params);
+
+    }
+    boolean TableValues()
+    {
+        Bundle extra= getIntent().getExtras();
+        if(extra!=null) idTec=extra.getString( "idTec" );
+        else idTec=cbc.getdUserId();
+        SQLiteDatabase db = con.getWritableDatabase();
+        String SQL = "";
+        String idParte="";
+        SQL = "SELECT * FROM " + dbTecnicos.TABLE + " WHERE idTec='"+idTec+"'";
+        Cursor resp = db.rawQuery( SQL, null );
+        if (resp.moveToPosition( 0 )) {
+
+            idParte = resp.getString( 0 );
+        }
+        db.close();
+        if (resp.getCount() != 0 && resp!=null)
+        {
+            return false;
+        }else return true;
+    }
+
 
 }

@@ -59,7 +59,7 @@ public class InsumosSubItem extends AppCompatActivity {
         setSupportActionBar( toolbar );
         Bundle extra=getIntent().getExtras();
 
-        con =  new ConnSQLiteHelper( this,"bdtecSinInternet",null, 1);
+        con =  new ConnSQLiteHelper( this);
         sql = new SQLite();
         if(extra!=null)
         {
