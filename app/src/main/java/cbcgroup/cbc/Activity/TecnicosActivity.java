@@ -76,17 +76,7 @@ public class TecnicosActivity  extends AppCompatActivity
             }
         } );
 
-        ////////////////////
-        /*if(cbc.Internet()) Programa();
-        else{
-            Toast.makeText( this,"Usted esta trabajando sin conexion",Toast.LENGTH_LONG ).show();
-            ProgramaSinConexion();
-        }*/
     }
-    //Configuracion pcl, tipo de fuente, pagina etc
-
-
-
     void List(String  res)
     {
         final ArrayList<ListInsumo> list=new ArrayList<>();
@@ -201,7 +191,7 @@ public class TecnicosActivity  extends AppCompatActivity
         final ArrayList<ListInsumo> list=new ArrayList<>();
         list.clear();
         SQLiteDatabase db = con.getReadableDatabase();
-        String SQL="SELECT nParte,Cliente FROM "+ dbTecnicos.TABLE + " WHERE idTec='"+idTec+"'";
+        String SQL="SELECT nParte,Cliente FROM "+ dbTecnicos.TABLE + " WHERE Ingreso!=2 AND idTec='"+idTec+"'";
         Cursor resp=db.rawQuery( SQL,null);
         Log.w("LIST","lista:"+resp.getCount());
         for(int i=0;i<resp.getCount();i++)

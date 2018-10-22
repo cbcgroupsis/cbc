@@ -115,6 +115,12 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
 
                     }
                 } );
+                /*holder.onLogClick( new ItemClickListener() {
+                    @Override
+                    public void onItemClick(View v, int numPoss) {
+                            Toast.makeText( ctx,"APRETADO" + insumos.get( numPoss ).oneDate.toString(),Toast.LENGTH_LONG ).show();
+                    }
+                } );*/
             }else if(List==4)
             {
                 holder.numPedido.setText( insumos.get( pos ).getNumPedido() );
@@ -146,9 +152,7 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
 
 
                         }
-
                         db.close();
-
                         /***/
                         //if(cbc.getIngresoTecnico() && cbc.getIngresoNpedido().equals( npedido ))ctx.startActivity(new Intent( ctx, TecnicosOut.class ).putExtra( "nameTecSa",cbc.getTecSa() ).putExtra( "npedido",npedido ));
                        //else ctx.startActivity(new Intent( ctx, TecnicoIn.class ).putExtra( "nameTecSa",cbc.getTecSa() ).putExtra( "npedido",npedido ));

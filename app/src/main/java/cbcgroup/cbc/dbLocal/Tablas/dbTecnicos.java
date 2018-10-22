@@ -4,7 +4,7 @@ public class dbTecnicos
 {
     public static String CREATE_TABLE="CREATE TABLE [Tecnicos] (\n"+
         "[nParte] TEXT  UNIQUE NOT NULL ,\n"+
-            "[idTec] TEXT  UNIQUE NOT NULL ,\n"+
+            "[idTec] TEXT NOT NULL ,\n"+
         "[Cliente] TEXT  NOT NULL,\n"+
         "[nSerie] TEXT  NOT NULL,\n"+
         "[Sector] TEXT  NOT NULL,\n"+

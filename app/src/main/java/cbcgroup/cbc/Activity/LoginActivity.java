@@ -130,7 +130,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Map<String, String> params = new Hashtable<>();                                     //Parametros a enviar.
                 params.put("user_name",userName.getText().toString());                              //nombre del usuario
                 params.put("user_password",userPassword.getText().toString());                      //contraseña.
-                params.put("token",token);                                                          //Envio el identificador unico del celular.
+             //   params.put("token",token);                                                          //Envio el identificador unico del celular.
                 return params;                                                                      //Envio los parametros por el metodo post.
             }
 

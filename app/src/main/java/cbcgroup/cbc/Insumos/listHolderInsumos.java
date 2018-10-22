@@ -36,6 +36,7 @@ public class listHolderInsumos extends RecyclerView.ViewHolder implements View.O
     {
         this.itemClickListener.onItemClick( v,getLayoutPosition() );
     }
+    public void onLogClick(ItemClickListener ic){this.itemClickListener=ic;}
     public void itemClickListener(ItemClickListener ic)
     {
         this.itemClickListener=ic;

@@ -40,7 +40,5 @@
             android:layout_below="@+id/mSearch"
             android:layout_height="wrap_content"
             class="android.support.v7.widget.RecyclerView" />
-
     </LinearLayout>
-
 </android.support.constraint.ConstraintLayout>

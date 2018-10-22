@@ -33,7 +33,9 @@
         <activity android:name=".Activity.InsumosSubItem" />
         <activity android:name=".Activity.TecnicoIn" />
         <activity android:name=".Activity.TecnicosActivity" />
-        <activity android:name=".Activity.TecnicosOut" >
+        <activity android:name=".Activity.TecnicosOut"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"
+            >
         </activity>
         <receiver android:name=".Clases.NetWorkStateChecker">
             <intent-filter>

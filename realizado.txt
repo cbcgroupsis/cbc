@@ -1,0 +1,13 @@
+*String
+*Color
+*Style
+*GradientColor
+*Manifest->Permiso de internet.
+*Gradle->Implementacion de las librerias:
+		->Volley
+		->CardView
+		->RecyclerView
+		->Design 27.1.1	
+*Activity->Login
+*Layou	->Login
+*Class->cbc
