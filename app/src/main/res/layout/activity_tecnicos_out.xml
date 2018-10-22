@@ -4,24 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="vertical"
+    android:background="@drawable/gradient_color"
+
     tools:context=".Activity.TecnicosOut">
 
+<ScrollView
+    android:id="@+id/ScrollView01"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/gradient_color"
         android:gravity="center"
         android:orientation="vertical"
         android:weightSum="1"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp"
         android:id="@+id/linearLayoutTecnicos"
+        android:scrollbars="vertical"
         tools:ignore="MissingConstraints">
 
-        <LinearLayout
 
-            android:layout_width="300dp"
+
+
+
+        <LinearLayout android:layout_width="300dp"
             android:layout_height="match_parent"
             android:layout_weight="0.9"
             android:orientation="vertical">
@@ -216,8 +225,8 @@
                             android:textColor="#ffffff" />
                         <ImageButton
                             android:id="@+id/imgTecnico"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_width="200px"
+                            android:layout_height="200px"
                             android:src="@drawable/img_icono_camara"
                             android:background="@drawable/rounded_textviewa" />
                     </LinearLayout>
@@ -239,6 +248,6 @@
             android:textColorHint="#ffffff" />
     </LinearLayout>
 
-
+</ScrollView>
 
 </android.support.constraint.ConstraintLayout>

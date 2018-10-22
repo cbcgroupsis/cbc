@@ -9,15 +9,16 @@ import cbcgroup.cbc.R;
 
 public class listHolderInsumos extends RecyclerView.ViewHolder implements View.OnClickListener
 {
-    public TextView numPedido,nombreCliente,numSerie,modelo,oneDate;
+    public TextView numPedido,nombreCliente,numSerie,modelo,oneDate,categoria;
     ItemClickListener itemClickListener;
     public listHolderInsumos(View itemView,int List)
     {
         super( itemView );
-        if(List==1 || List==4)
+        if(List==1)
         {
             numPedido=itemView.findViewById( R.id.insumosNpedido );
             nombreCliente=itemView.findViewById( R.id.insumosNombreCliente );
+
         }else if(List==2)
         {
             numSerie=itemView.findViewById( R.id.insumosNumSerie );
@@ -25,6 +26,11 @@ public class listHolderInsumos extends RecyclerView.ViewHolder implements View.O
         }else if(List==3)
         {
             oneDate=itemView.findViewById( R.id.list3OneDate);
+        }else if(List ==4)
+        {
+            numPedido=itemView.findViewById( R.id.insumosNpedido );
+            nombreCliente=itemView.findViewById( R.id.insumosNombreCliente );
+            categoria=itemView.findViewById( R.id.Categoria);
         }
 
         itemView.setOnClickListener( this );
@@ -36,6 +42,7 @@ public class listHolderInsumos extends RecyclerView.ViewHolder implements View.O
     {
         this.itemClickListener.onItemClick( v,getLayoutPosition() );
     }
+    public void onLogClick(ItemClickListener ic){this.itemClickListener=ic;}
     public void itemClickListener(ItemClickListener ic)
     {
         this.itemClickListener=ic;

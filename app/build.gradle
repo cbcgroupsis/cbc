@@ -4,10 +4,10 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "angel.cbcgroup"
-        minSdkVersion 22
+        minSdkVersion 21
         targetSdkVersion 27
-        versionCode 33
-        versionName "1.1.1.1.17"
+        versionCode 37
+        versionName "1.1.1.1.21"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -37,9 +37,10 @@ dependencies {
     //Firebase
     implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.google.firebase:firebase-messaging:17.0.0'
-
+    //Detectar si hay conectividad a internet.
+    implementation 'com.evernote:android-job:1.2.6'
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha07'
 
 
 }
 apply plugin: 'com.google.gms.google-services'
-

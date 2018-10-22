@@ -4,10 +4,11 @@ public class dbTecnicos
 {
     public static String CREATE_TABLE="CREATE TABLE [Tecnicos] (\n"+
         "[nParte] TEXT  UNIQUE NOT NULL ,\n"+
-            "[idTec] TEXT  UNIQUE NOT NULL ,\n"+
+            "[idTec] TEXT NOT NULL ,\n"+
         "[Cliente] TEXT  NOT NULL,\n"+
         "[nSerie] TEXT  NOT NULL,\n"+
         "[Sector] TEXT  NOT NULL,\n"+
+            "[Categoria] TEXT  NOT NULL,\n"+
         "[FechaVence] TEXT  NOT NULL,\n"+
         "[Fecha] TEXT  NOT NULL,\n"+
             "[Modelo] TEXT  NOT NULL,\n"+
@@ -26,4 +27,5 @@ public class dbTecnicos
     public static String CAMPO_MODELO="Modelo";
     public static String CAMPO_INGRESO="Ingreso";
     public static String CAMPO_IDTEC="idTec";
+    public static String CAMPO_CATEGORIA="Categoria";
 }

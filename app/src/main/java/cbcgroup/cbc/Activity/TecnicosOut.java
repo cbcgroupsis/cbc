@@ -89,6 +89,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_tecnicos_out );
+        //Asocio la parte logica con la parte grafica
         modelo=findViewById( R.id.tec_modelo );
         modelo.setMovementMethod(new ScrollingMovementMethod());
         serie=findViewById( R.id.tec_subItem_serie );
@@ -103,13 +104,17 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         fechaVencimiento=findViewById( R.id.tec_subItem_fechaVencimiento );
         linearLayout=findViewById( R.id.linearLayoutTecnicos );
         imgTec=findViewById( R.id.imgTecnico );
+        //Le paso el contexto a las clases.
         button.setOnClickListener( this );
         imgTec.setOnClickListener( this );
         linearLayout.setOnClickListener( this );
+        //Invoco las clases necesarias para la activity
         cbc= new CBC(TecnicosOut.this);
         con =  new ConnSQLiteHelper( this);
         sql = new SQLite();
+        //Lectura del Intent.
         extra=getIntent().getExtras();
+        //Completo la informacion guardada en la base de datos local.
         CompleteInfo();
     }
 
@@ -185,7 +190,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         return hora <= 60 && minutos <= 60;
     }
 
-    void completeInfo()
+  /*  void completeInfo()
     {
         cbc.progressDialog( "Cargando Informacion...","Espere por favor." );
         RequestQueue requestQueue = Volley.newRequestQueue(TecnicosOut.this);
@@ -238,7 +243,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         };
         requestQueue.add(stringRequest);
     }
-
+*/
     void CerrarPedido()
     {
 
@@ -295,7 +300,9 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                     public void onErrorResponse(VolleyError volleyError)
                     {
                         Log.i( TAG,volleyError.toString());
-                        Toast.makeText( TecnicosOut.this, "Error: "+volleyError.toString(), Toast.LENGTH_SHORT ).show();
+                        Toast.makeText( TecnicosOut.this, "Se cerro el pedido correctamente!", Toast.LENGTH_SHORT ).show();
+
+                        // Toast.makeText( TecnicosOut.this, "Error: "+volleyError.toString(), Toast.LENGTH_SHORT ).show();
                     }
                 })
         {
@@ -436,7 +443,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                     public void onErrorResponse(VolleyError volleyError)
                     {
                         loading.dismiss();
-                        Toast.makeText(TecnicosOut.this, "Error: No se pudo subir la imagen", Toast.LENGTH_LONG).show();
+                     //   Toast.makeText(TecnicosOut.this, "Error: No se pudo subir la imagen", Toast.LENGTH_LONG).show();
                         //Toast.makeText( Cam.this,volleyError.toString(),Toast.LENGTH_LONG ).show();
 
                     }
@@ -561,7 +568,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     {
         String nparte= extra.getString( "npedido" );
         SQLiteDatabase db = con.getReadableDatabase();
-        String SQL="UPDATE "+dbTecnicos.TABLE+" SET Ingreso='' WHERE nParte='"+ nparte+"'";
+        String SQL="UPDATE "+dbTecnicos.TABLE+" SET Ingreso='2' WHERE nParte='"+ nparte+"'";
         try
         {
             db.execSQL( SQL );
@@ -573,5 +580,3 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         db.close();
     }
 }
-//Antes los tecnicos levantaban los biaticos, natalia en el cac los aprobabas, y cuando ella lo aprobaba le leggaba u mail a Marcelo... Ese mail no le esta llegadndo, le esta llegando a analia sin la aprobacion de marcelo.
-//parte de biatico no aparece nada.

@@ -71,22 +71,13 @@ public class TecnicosActivity  extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                if(cbc.Internet())Programa();
+             if(cbc.Internet())Programa();
                 else Toast.makeText( TecnicosActivity.this,"No tiene Acceso Internet para Actualizar la Lista",Toast.LENGTH_LONG ).show();
             }
         } );
 
-        ////////////////////
-        /*if(cbc.Internet()) Programa();
-        else{
-            Toast.makeText( this,"Usted esta trabajando sin conexion",Toast.LENGTH_LONG ).show();
-            ProgramaSinConexion();
-        }*/
+
     }
-    //Configuracion pcl, tipo de fuente, pagina etc
-
-
-
     void List(String  res)
     {
         final ArrayList<ListInsumo> list=new ArrayList<>();
@@ -108,10 +99,12 @@ public class TecnicosActivity  extends AppCompatActivity
                 String nSerie=obj.getString( "serie" );
                 String sector= obj.getString( "sector" );
                 String ingreso=obj.getString("ingreso");
-                SincronizarDbLocal(npedido,cliente,nSerie,sector,fVence,fecha,ingreso,modelo,inconveniente);
+                String categoria=obj.getString("categoria");
+                SincronizarDbLocal(npedido,cliente,nSerie,sector,fVence,fecha,ingreso,modelo,inconveniente,categoria);
                 insumos=new ListInsumo();
                 insumos.setNumPedido(npedido);
                 insumos.setNombreCliente( cliente );
+                insumos.setCategoria( categoria );
                 list.add(insumos);
 
             }
@@ -201,7 +194,7 @@ public class TecnicosActivity  extends AppCompatActivity
         final ArrayList<ListInsumo> list=new ArrayList<>();
         list.clear();
         SQLiteDatabase db = con.getReadableDatabase();
-        String SQL="SELECT nParte,Cliente FROM "+ dbTecnicos.TABLE + " WHERE idTec='"+idTec+"'";
+        String SQL="SELECT nParte,Cliente,Categoria FROM "+ dbTecnicos.TABLE + " WHERE Ingreso!=2 AND idTec='"+idTec+"'";
         Cursor resp=db.rawQuery( SQL,null);
         Log.w("LIST","lista:"+resp.getCount());
         for(int i=0;i<resp.getCount();i++)
@@ -211,6 +204,7 @@ public class TecnicosActivity  extends AppCompatActivity
                 insumos=new ListInsumo();
                 insumos.setNumPedido(resp.getString( 0 ));
                 insumos.setNombreCliente( resp.getString( 1 ) );
+                insumos.setCategoria( resp.getString( 2 ) );
                 list.add(insumos);
 
             }
@@ -220,7 +214,7 @@ public class TecnicosActivity  extends AppCompatActivity
         db.close();
         Search();
     }
-    private void SincronizarDbLocal(String nParte,String Cliente,String Serie,String Sector, String Fvence, String fecha, String Ingreso,String Modelo, String Inconveniente)
+    private void SincronizarDbLocal(String nParte,String Cliente,String Serie,String Sector, String Fvence, String fecha, String Ingreso,String Modelo, String Inconveniente,String categoria)
     {
         Bundle extra= getIntent().getExtras();
         if(extra!=null) idTec=extra.getString( "idTec" );
@@ -238,6 +232,7 @@ public class TecnicosActivity  extends AppCompatActivity
         params.put( dbTecnicos.CAMPO_INCONVENIENTE,Inconveniente);
         params.put( dbTecnicos.CAMPO_MODELO,Modelo);
         params.put(dbTecnicos.CAMPO_IDTEC,idTec);
+        params.put(dbTecnicos.CAMPO_CATEGORIA,categoria);
         sql.Add(db,dbTecnicos.TABLE,params);
 
     }

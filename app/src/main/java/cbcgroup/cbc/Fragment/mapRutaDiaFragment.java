@@ -23,15 +23,8 @@ import android.widget.ProgressBar;
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link WebDct.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link WebDct#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class WebDct extends Fragment {
+public class mapRutaDiaFragment extends Fragment
+{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -40,11 +33,13 @@ public class WebDct extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
     private OnFragmentInteractionListener mListener;
-    private ProgressDialog progress;
-    private String dato_aux;
-    private String urll;
-    private ViewTreeObserver.OnScrollChangedListener mOnScrollChangedListener;
+    ProgressDialog progress;
+
+    String dato_aux;
+    String urll;
+    ViewTreeObserver.OnScrollChangedListener mOnScrollChangedListener;
     SharedPreferences menu;
     ProgressBar progressBar;
     WebView mWebView;
@@ -52,7 +47,7 @@ public class WebDct extends Fragment {
     int upCont=0;
     CBC cbc;
 
-    public WebDct() {
+    public mapRutaDiaFragment() {
         // Required empty public constructor
     }
 
@@ -62,11 +57,11 @@ public class WebDct extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment WebDct.
+     * @return A new instance of fragment mapRutaDiaFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static WebDct newInstance(String param1, String param2) {
-        WebDct fragment = new WebDct();
+    public static mapRutaDiaFragment newInstance(String param1, String param2) {
+        mapRutaDiaFragment fragment = new mapRutaDiaFragment();
         Bundle args = new Bundle();
         args.putString( ARG_PARAM1, param1 );
         args.putString( ARG_PARAM2, param2 );
@@ -78,15 +73,16 @@ public class WebDct extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         cbc = new CBC(this.getActivity());
-        if (getArguments() != null) {
+
+        if (getArguments() != null)
+        {
             urll=getArguments().getString( "dato_aux",null );
         }else
-        {
-            urll="https://tecnicos.cbcgroup.com.ar/test/login.aspx?__VIEWSTATE=%2FwEPDwUKMTQ3NDgwNDQ4OA9kFgICAw9kFgICAQ9kFgICAQ9kFgICAQ8PFgIeBFRleHQFEjIwLzExLzIwMTggOTo1NzowNGRkZBRI7Jzs%2BsVwutKBUlB30FtZU7Hq&__VIEWSTATEGENERATOR=930D1C2E&__EVENTVALIDATION=%2FwEWBQKL87bQCwLs0bLrBgLs0fbZDAKxi96RBQLWlM%2BbAluGhrPTQx0Dlu09jjr5rhUraKn%2F&TextBox1=" +
-                    cbc.getdUserName() +
-                    "&TextBox2=" +
-                    cbc.getdUserPassword() +
-                    "&Button3=Iniciar+Sesi%C3%B2n";
+            {
+                String idTec=cbc.getdUserId();
+                String nameTec=cbc.getdUserName();
+                urll="https://tecnicos.cbcgroup.com.ar/test/app_android/Desarrollo/web/html/map.html?idTec="+idTec+"&nameTec="+nameTec;
+
         }
     }
 
@@ -94,50 +90,17 @@ public class WebDct extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         final View view=inflater.inflate(R.layout. fragment_web_dct, container, false);
+
+
         progressBar = view.findViewById( R.id.progressBar );
         mWebView =  view.findViewById( R.id.web_frag_dct );
         Programa_principal();
 
         swipeRefreshLayout = view.findViewById( R.id.swipe_web_dct );
-        swipeRefreshLayout.setColorSchemeColors( 0x2196F3 );
-        swipeRefreshLayout.getViewTreeObserver().addOnScrollChangedListener( mOnScrollChangedListener = new ViewTreeObserver.OnScrollChangedListener()
-        {
-
-            @Override
-            public void onScrollChanged() {
-                if (mWebView.getScrollY() == 0)
-                {
-                    upCont++;
-                    if(upCont>2)
-                    {
-                        swipeRefreshLayout.setEnabled( true );
-                        upCont=1;
-                    }
-                }
-                else
-                    swipeRefreshLayout.setEnabled(false);
-
-            }
-        });
-        swipeRefreshLayout.setOnRefreshListener( new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh()
-            {
-                swipeRefreshLayout.setRefreshing( true );
-                (new Handler(  )).postDelayed( new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeRefreshLayout.setRefreshing( false );
-                        Programa_principal( );
-                    }
-                },2000 );
-
-            }
-        } );
-
-
-
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefreshLayout.setEnabled(false);
         return view;
     }
 
@@ -179,6 +142,7 @@ public class WebDct extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
     void Programa_principal()
     {
 
@@ -190,6 +154,7 @@ public class WebDct extends Fragment {
         webSettings.setDisplayZoomControls(false);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setUseWideViewPort(true);
+        Log.w("URLRUTA",urll);
 
         mWebView.setWebViewClient(new WebViewClient() {
             @Override

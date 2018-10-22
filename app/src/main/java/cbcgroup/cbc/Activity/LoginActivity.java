@@ -105,6 +105,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                 cbc.setUserSector(obj.getString( "sector" ));                 //Obtengo el valor del objeto "sector" y lo guardo en la memoria.
                                 cbc.setUserId(obj.getString( "iduser" ) );                    //Obtengo el valor del objeto "iduser" y lo guardo en la memoria.
                                 cbc.setUserEmail(obj.getString( "mail" ) );                   //Obtengo el valor del objeto "mail" y lo guardo en la memoria.
+                                cbc.setUserPassword(userPassword.getText().toString());
                                 HomeStart();                                                        //Llamo al metodo HomeStart y inicializo la actividad Home.
                             }else cbc.msg( "No se puede autentificar, verifique los datos ingresados" ); //Caso de que la autentificacion fuera erronea, indico que los datos ingresados fueron incorrectos.
                         } catch (Exception error)                                                   //
@@ -130,7 +131,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Map<String, String> params = new Hashtable<>();                                     //Parametros a enviar.
                 params.put("user_name",userName.getText().toString());                              //nombre del usuario
                 params.put("user_password",userPassword.getText().toString());                      //contraseña.
-                params.put("token",token);                                                          //Envio el identificador unico del celular.
+             //   params.put("token",token);                                                          //Envio el identificador unico del celular.
                 return params;                                                                      //Envio los parametros por el metodo post.
             }
 

@@ -24,6 +24,7 @@ import com.android.volley.toolbox.Volley;
 import java.util.Hashtable;
 import java.util.Map;
 
+import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
 
 public class ReporteDeErroresActivity extends AppCompatActivity implements View.OnClickListener {
@@ -35,6 +36,7 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
     EditText editText;
     private Button btnEnviar;
     private LinearLayout linearLayout;
+    private CBC cbc;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -46,6 +48,7 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
         linearLayout=findViewById( R.id.linearLayoutReporteDeErrores );
         linearLayout.setOnClickListener( this );
         btnEnviar.setOnClickListener( this );
+        cbc=new CBC(this);
     }
 
     @Override
@@ -53,8 +56,8 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
     {
         if(v==btnEnviar)
         {
-            nombre=info.getString( "name" ,"");
-            mail=info.getString("mail","");
+            nombre=cbc.getdUserName();
+            mail=cbc.getdUserEmail();
             mensaje=editText.getText().toString();
 
             if(!mensaje.matches( "" ) )

@@ -8,6 +8,16 @@ public class ListInsumo
     String modelo;
     String oneDate;
     String idTec;
+    String categoria;
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
     public String getIdTec() {
         return idTec;
     }

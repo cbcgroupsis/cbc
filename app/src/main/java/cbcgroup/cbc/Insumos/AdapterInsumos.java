@@ -56,9 +56,10 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
     public listHolderInsumos onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View v=null;
-        if(List==1 ||List==4) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list1,null );
+        if(List==1) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list1,null );
         if(List==2) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list2_subitem,null );
         if(List==3)v = LayoutInflater.from(parent.getContext()).inflate( R.layout.list3_onedate,null );
+        if(List==4) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list4,null );
 
         listHolderInsumos holder= new listHolderInsumos( v,List);
 
@@ -77,7 +78,6 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
             {
                 holder.numPedido.setText( insumos.get( pos ).getNumPedido() );
                 holder.nombreCliente.setText( insumos.get( pos ).getNombreCliente() );
-
 
                 holder.itemClickListener( new ItemClickListener() {
                     @Override
@@ -115,11 +115,17 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
 
                     }
                 } );
+                /*holder.onLogClick( new ItemClickListener() {
+                    @Override
+                    public void onItemClick(View v, int numPoss) {
+                            Toast.makeText( ctx,"APRETADO" + insumos.get( numPoss ).oneDate.toString(),Toast.LENGTH_LONG ).show();
+                    }
+                } );*/
             }else if(List==4)
             {
                 holder.numPedido.setText( insumos.get( pos ).getNumPedido() );
                 holder.nombreCliente.setText( insumos.get( pos ).getNombreCliente() );
-
+                holder.categoria.setText(insumos.get(pos).getCategoria());
 
                 holder.itemClickListener( new ItemClickListener() {
                     @Override
@@ -146,9 +152,7 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
 
 
                         }
-
                         db.close();
-
                         /***/
                         //if(cbc.getIngresoTecnico() && cbc.getIngresoNpedido().equals( npedido ))ctx.startActivity(new Intent( ctx, TecnicosOut.class ).putExtra( "nameTecSa",cbc.getTecSa() ).putExtra( "npedido",npedido ));
                        //else ctx.startActivity(new Intent( ctx, TecnicoIn.class ).putExtra( "nameTecSa",cbc.getTecSa() ).putExtra( "npedido",npedido ));

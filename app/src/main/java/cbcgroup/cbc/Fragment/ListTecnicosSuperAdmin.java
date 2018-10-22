@@ -261,7 +261,6 @@ public class ListTecnicosSuperAdmin extends Fragment {
             {
                 insumos=new ListInsumo();
                 insumos.setOneDate(resp.getString(0));
-
                 list.add(insumos);
                 Log.w("LIST","lista:"+resp.getString(0));
             }

@@ -70,7 +70,11 @@ public class InsumosFragment extends Fragment
         recyclerView.setItemAnimator( new DefaultItemAnimator() );
         cbc=new CBC(getActivity());
         if(cbc.Internet()) Programa();
-        else ProgramaSinConexion();
+        else
+            {
+                Toast.makeText( getContext(),"Usted esta trabajando sin conexion",Toast.LENGTH_LONG ).show();
+                ProgramaSinConexion();
+            }
         return view;
     }
 
@@ -107,16 +111,16 @@ public class InsumosFragment extends Fragment
             for(int a=0;a<jsonInsumos.length();a++)
             {
                 JSONObject obj=jsonInsumos.getJSONObject( a );
-                insumos=new ListInsumo();
-                insumos.setNumPedido(obj.getString( "npedido" ));
-                insumos.setNombreCliente(obj.getString( "cliente" ));
+            //    insumos=new ListInsumo();
+            //    insumos.setNumPedido(obj.getString( "npedido" ));
+           //     insumos.setNombreCliente(obj.getString( "cliente" ));
                 SincronizarDbLocal(obj.getString( "npedido" ),obj.getString( "cliente" ),obj.getString( "serie"),obj.getString( "modelo" ) );
-                list.add(insumos);
+             //   list.add(insumos);
             }
-     //     ProgramaSinConexion();
+          ProgramaSinConexion();
 
-            adapter=new AdapterInsumos(getActivity(),list,1);
-            recyclerView.setAdapter(adapter);
+          //  adapter=new AdapterInsumos(getActivity(),list,1);
+          //  recyclerView.setAdapter(adapter);
         } catch (JSONException e)
         {
             e.printStackTrace();
@@ -203,7 +207,7 @@ public class InsumosFragment extends Fragment
     }
     private void ProgramaSinConexion()
     {
-        Toast.makeText( getContext(),"Usted esta trabajando sin conexion",Toast.LENGTH_LONG ).show();
+
         final ArrayList<ListInsumo> list=new ArrayList<>();
         list.clear();
         SQLiteDatabase db = con.getReadableDatabase();

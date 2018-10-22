@@ -1,15 +1,14 @@
 package cbcgroup.cbc.Clases;
 
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
+import android.annotation.SuppressLint;
+import android.app.job.JobParameters;
+import android.app.job.JobService;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.provider.SyncStateContract;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,82 +23,93 @@ import com.android.volley.toolbox.Volley;
 import java.util.Hashtable;
 import java.util.Map;
 
-import cbcgroup.cbc.Activity.HomeActivity;
-import cbcgroup.cbc.Activity.TecnicosOut;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
-import cbcgroup.cbc.dbLocal.SQLite;
-import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 import cbcgroup.cbc.dbLocal.Tablas.dbInsumosSinInternet;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 
-public class NetWorkStateChecker extends BroadcastReceiver {
+public class NetworkSchedulerService extends JobService implements
+        ConnectivityReceiver.ConnectivityReceiverListener {
 
-    //context and database helper object
-    private String URLIMAGEN = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
-    String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/imagen.php";
+    private static final String TAG = "TESTINTERNET";
+    private static final String URLIMAGEN = "https://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
+    private static final String URL = "https://tecnicos.cbcgroup.com.ar/Test/app_android/imagen.php";
     private Context context;
     private ConnSQLiteHelper con;
-    private SQLite sql;
-    CBC cbc;
+    private CBC cbc;
+    private ConnectivityReceiver mConnectivityReceiver;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-
-        this.context = context;
-
+    public void onCreate() {
+        super.onCreate();
+        Log.i(TAG, "Service created");
+        this.context = this;
         con =  new ConnSQLiteHelper(context);
-        sql = new SQLite();
         cbc = new CBC(context);
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
-        //if there is a network
-        if (activeNetwork != null) {
-            //if connected to wifi or mobile data plan
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI || activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-              //  Toast.makeText(context,"hay internet",Toast.LENGTH_LONG).show();
-
-                    //if(cbc.getdUserSector()=="deposito" || cbc.getdUserSector()=="super admin"  || cbc.getdUserSector()=="comercial")uploadImage();
-                    //if(cbc.getdUserSector()=="tecnicos" || cbc.getdUserSector()=="super admin"  || cbc.getdUserSector()=="comercial")uploadImage2();
-                        Log.w("SINCONEXCION","hay Internet");
-                    uploadImage2();
-                    uploadImage();
-
-            }Log.w("SINCONEXCION","NO HAY Internet");
-        }Log.w("SINCONEXCION","NO HAY hay Internet");
+        mConnectivityReceiver = new ConnectivityReceiver(this);
     }
 
+
+
+    /**
+     * When the app's NetworkConnectionActivity is created, it starts this service. This is so that the
+     * activity and this service can communicate back and forth. See "setUiCallback()"
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, "onStartCommand");
+        return START_NOT_STICKY;
+    }
+
+
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        Log.i(TAG, "onStartJob" + mConnectivityReceiver);
+        registerReceiver(mConnectivityReceiver, new IntentFilter(Constants.CONNECTIVITY_ACTION));
+        return true;
+    }
+
+    @Override
+    public boolean onStopJob(JobParameters params) {
+        Log.i(TAG, "onStopJob");
+        unregisterReceiver(mConnectivityReceiver);
+        return true;
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected)
+    {
+        String message;
+        if(isConnected)
+        {
+            //message="Conectado a internet";
+               uploadImage2();
+              uploadImage();
+        }
+        //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+
+    }
 
     Map<String,String> Mostrar()
     {
         SQLiteDatabase db = con.getWritableDatabase();
         Map<String, String> params = new Hashtable<>();
         String SQL="SELECT id_tec,serie,id_parte,mensaje,copias,copiasColor,viaje,foto,Espera FROM "+ dbTecSinInternet.TABLE;
-        Cursor resp=db.rawQuery( SQL,null );
+        @SuppressLint("Recycle") Cursor resp=db.rawQuery( SQL,null );
         if(resp==null) return null;
-            if(resp.moveToPosition( 0 ))
-            {
-                Log.w("SINCONEXCION","idTec->"+resp.getString( 0 ));
-                Log.w("SINCONEXCION","serie->"+resp.getString( 1 ));
-                Log.w("SINCONEXCION","idparte->"+resp.getString( 2 ));
-                Log.w("SINCONEXCION","mensaje->"+resp.getString( 3 ));
-                Log.w("SINCONEXCION","copias->"+resp.getString( 4 ));
-                Log.w("SINCONEXCION","copiasColor->"+resp.getString( 5 ));
-                Log.w("SINCONEXCION","viaje->"+resp.getString( 6 ));
-                Log.w("SINCONEXCION","foto->"+resp.getString( 7 ));
-                Log.w("SINCONEXCION","Espera->"+resp.getString( 8 ));
-
-                params.put("foto", resp.getString( 7 ));
-                params.put("nparte",resp.getString( 2 ));
-                params.put("id_tecnico",resp.getString( 0 ));
-                params.put("serie",resp.getString( 1 ));
-                params.put("id_parte", resp.getString( 2 ));
-                params.put("mensaje",resp.getString( 3 ));
-                params.put("copias",resp.getString( 4 ));
-                params.put("copiasColor",resp.getString( 5 ));
-                params.put("viaje",resp.getString( 6 ));
-
-            }
+        if(resp.moveToPosition( 0 ))
+        {
+            /*Parametros a enviar*/
+            Log.w(TAG,"Enviando...");
+            params.put("id_tecnico",resp.getString( 0 ));
+            params.put("serie",resp.getString( 1 ));
+            params.put("nparte",resp.getString( 2 ));
+            params.put("id_parte", resp.getString( 2 ));
+            params.put("mensaje",resp.getString( 3 ));
+            params.put("copias",resp.getString( 4 ));
+            params.put("copiasColor",resp.getString( 5 ));
+            params.put("viaje",resp.getString( 6 ));
+            params.put("foto", resp.getString( 7 ));
+        }
 
         db.close();
         return params;
@@ -108,16 +118,11 @@ public class NetWorkStateChecker extends BroadcastReceiver {
     private void uploadImage() {
         //final ProgressDialog loading = ProgressDialog.show(this, "Subiendo...", "Espere por favor...", false, false);
         SQLiteDatabase db = con.getWritableDatabase();
-        String SQL = "";
-        String idParte="";
-        SQL = "SELECT id_tec,serie,id_parte,mensaje,copias,copiasColor,viaje,foto,Espera FROM " + dbTecSinInternet.TABLE;
-        Cursor resp = db.rawQuery( SQL, null );
-        if (resp.moveToPosition( 0 )) {
-
-            idParte = resp.getString( 2 );
-        }
+        String SQL = "SELECT id_tec,serie,id_parte,mensaje,copias,copiasColor,viaje,foto,Espera FROM " + dbTecSinInternet.TABLE;
+        @SuppressLint("Recycle") Cursor resp = db.rawQuery( SQL, null );
+        resp.moveToPosition( 0 );
         db.close();
-        if (resp.getCount() != 0 && resp!=null)
+        if (resp.getCount() != 0)
         {
             StringRequest stringRequest = new StringRequest( Request.Method.POST, URLIMAGEN,
                     new Response.Listener<String>() {
@@ -125,9 +130,8 @@ public class NetWorkStateChecker extends BroadcastReceiver {
                         public void onResponse(String s) {
                             SQLiteDatabase db = con.getWritableDatabase();
                             String idParte = "";
-                            String SQL = "";
-                            SQL = "SELECT id_tec,serie,id_parte,mensaje,copias,copiasColor,viaje,foto,Espera FROM " + dbTecSinInternet.TABLE;
-                            Cursor resp = db.rawQuery( SQL, null );
+                            String SQL = "SELECT id_tec,serie,id_parte,mensaje,copias,copiasColor,viaje,foto,Espera FROM " + dbTecSinInternet.TABLE;
+                            @SuppressLint("Recycle") Cursor resp = db.rawQuery( SQL, null );
                             if (resp.moveToPosition( 0 )) {
 
                                 idParte = resp.getString( 2 );
@@ -139,13 +143,13 @@ public class NetWorkStateChecker extends BroadcastReceiver {
                                 SQL = "DELETE FROM " + dbTecSinInternet.TABLE + " WHERE id_parte='" + idParte + "';";
                                 try {
                                     db.execSQL( SQL );
-                                    Log.w( "SINCONEXCION", "FILA BORRADA" );
+                                    Log.w( TAG, "FILA BORRADA" );
                                     uploadImage();
                                     db.close();
 
 
                                 } catch (Exception e) {
-                                    Log.w( "SINCONEXCION", e.toString() );
+                                    Log.w( TAG, e.toString() );
                                 }
                                 db.close();
                             }
@@ -177,7 +181,7 @@ public class NetWorkStateChecker extends BroadcastReceiver {
         SQLiteDatabase db = con.getWritableDatabase();
         Map<String, String> params = new Hashtable<>();
         String SQL="SELECT Nombre,Serie,Foto,nPedido FROM "+ dbInsumosSinInternet.TABLE;
-        Cursor resp=db.rawQuery( SQL,null );
+        @SuppressLint("Recycle") Cursor resp=db.rawQuery( SQL,null );
         if(resp==null) return null;
         if(resp.moveToPosition( 0 ))
         {
@@ -191,19 +195,17 @@ public class NetWorkStateChecker extends BroadcastReceiver {
         db.close();
         return params;
     }
+    @SuppressLint("Recycle")
     private void uploadImage2() {
         //final ProgressDialog loading = ProgressDialog.show(this, "Subiendo...", "Espere por favor...", false, false);
-        SQLiteDatabase db = con.getWritableDatabase();
-        String SQL = "";
-        String idParte="";
-        SQL="SELECT Nombre,Serie,Foto FROM "+ dbInsumosSinInternet.TABLE;
-        Cursor resp = db.rawQuery( SQL, null );
-        if (resp.moveToPosition( 0 )) {
-
-            idParte = resp.getString( 0 );
+        Cursor resp;
+        try (SQLiteDatabase db = con.getWritableDatabase()) {
+            String SQL = "SELECT Nombre,Serie,Foto FROM " + dbInsumosSinInternet.TABLE;
+            resp = db.rawQuery( SQL, null );
+            resp.moveToPosition( 0 );
+            db.close();
         }
-        db.close();
-        if (resp.getCount() != 0 && resp!=null)
+        if (resp.getCount() != 0)
         {
             StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                     new Response.Listener<String>() {
@@ -211,8 +213,7 @@ public class NetWorkStateChecker extends BroadcastReceiver {
                         public void onResponse(String s) {
                             SQLiteDatabase db = con.getWritableDatabase();
                             String idParte = "";
-                            String SQL = "";
-                            SQL="SELECT Nombre,nPedido,Serie,Foto FROM "+ dbInsumosSinInternet.TABLE;
+                            String SQL="SELECT Nombre,nPedido,Serie,Foto FROM "+ dbInsumosSinInternet.TABLE;
                             Cursor resp = db.rawQuery( SQL, null );
                             if (resp.moveToPosition( 0 )) {
 
@@ -225,13 +226,13 @@ public class NetWorkStateChecker extends BroadcastReceiver {
                                 SQL = "DELETE FROM " + dbInsumosSinInternet.TABLE + " WHERE nPedido='" + idParte + "';";
                                 try {
                                     db.execSQL( SQL );
-                                    Log.w( "SINCONEXCION", "FILA BORRADA" );
+                                    Log.w( TAG, "FILA BORRADA" );
                                     uploadImage2();
                                     db.close();
 
 
                                 } catch (Exception e) {
-                                    Log.w( "SINCONEXCION", e.toString() );
+                                    Log.w( TAG, e.toString() );
                                 }
                                 db.close();
                             }
