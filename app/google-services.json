@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "561183699528",
+    "firebase_url": "https://cbcgroup-app.firebaseio.com",
+    "project_id": "cbcgroup-app",
+    "storage_bucket": "cbcgroup-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561183699528:android:c5b1bd9cda792853",
+        "android_client_info": {
+          "package_name": "angel.cbcgroup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561183699528-kfcm8df07p0b0g9r2g8ja9frh23fqak7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "angel.cbcgroup",
+            "certificate_hash": "7ad7147eb7ace1d82acb7308e7a466e8eb8f928e"
+          }
+        },
+        {
+          "client_id": "561183699528-5qk4i3i43bbq0t14eqcr51ai24gl8dip.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt0p3tD6GUb1Fux8QypKjwYUBuNG-ySjs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561183699528-5qk4i3i43bbq0t14eqcr51ai24gl8dip.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

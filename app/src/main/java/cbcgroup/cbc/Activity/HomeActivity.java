@@ -1,8 +1,15 @@
 package cbcgroup.cbc.Activity;
 
+import android.annotation.TargetApi;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
@@ -23,31 +30,44 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.evernote.android.job.JobRequest;
+
+import java.util.concurrent.TimeUnit;
+
 import cbcgroup.cbc.Clases.CBC;
 ;
+import cbcgroup.cbc.Clases.NetworkSchedulerService;
 import cbcgroup.cbc.Fragment.HomeFragment;
 import cbcgroup.cbc.Fragment.InsumosFragment;
 import cbcgroup.cbc.Fragment.ListTecnicosSuperAdmin;
 import cbcgroup.cbc.Fragment.WebDct;
+import cbcgroup.cbc.Fragment.mapRutaDiaFragment;
 import cbcgroup.cbc.R;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,InsumosFragment.OnFragmentInteractionListener,HomeFragment.OnFragmentInteractionListener,ListTecnicosSuperAdmin.OnFragmentInteractionListener,WebDct.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener,
+        InsumosFragment.OnFragmentInteractionListener,
+        HomeFragment.OnFragmentInteractionListener,
+        ListTecnicosSuperAdmin.OnFragmentInteractionListener,
+        mapRutaDiaFragment.OnFragmentInteractionListener,
+        WebDct.OnFragmentInteractionListener{
 
 
-    private static final String TAG = "HomeActivity" ;
-    //private FirebaseAuth firebaseAuth;
-    //private FirebaseAuth.AuthStateListener authStateListener;
+    private static final String TAG = "TAG_HomeActivity";
     private NavigationView navigationView ;
     private TextView edtNombreMenu,edtEmailMenu;
     private CBC cbc;
     private boolean webUse=false,fragmentUse=true;
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_home );
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
+        scheduleJob();
         navigationView  =  findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         Home();
@@ -70,6 +90,7 @@ public class HomeActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById( R.id.nav_view );
         navigationView.setNavigationItemSelectedListener( this );
+
     }
     @Override
     public void onBackPressed() {
@@ -116,9 +137,13 @@ public class HomeActivity extends AppCompatActivity
         /******************* Tecnicos *************************/
         else if(id==R.id.tecnicos_tecnicos)
         {
-            if(cbc.getdUserSector().equals( "super admin" ) || cbc.getdUserSector().equals( "direccion") ||  cbc.getdUserSector().equals( "comercial"))TecnicosFragment();
+            if(cbc.getdUserSector().equals( "super admin" ) || cbc.getdUserSector().equals( "direccion") ||  cbc.getdUserSector().equals( "comercial") || cbc.getdUserSector().equals( "supervisor tecnico") )TecnicosFragment();
             else startActivity( new Intent( HomeActivity.this,TecnicosActivity.class ));
+        }else if(id==R.id.ruta_dia)
+        {
+            RutaDia();
         }
+
         /******************* Cliente  ************************/
         else if(id== R.id.cliente_pedidos_insumos) Web_Redirect("insumos");
         else if(id== R.id.cliente_tecnicos)Web_Redirect("tecnicos");
@@ -204,7 +229,7 @@ public class HomeActivity extends AppCompatActivity
             navigationView.getMenu().setGroupVisible( R.id.menu_cliente, true );
             navigationView.getMenu().setGroupVisible( R.id.menu_tecnicos, true );
             // cliente = true;
-        } else if (cbc.getdUserSector().equals( "tecnicos" )) {
+        } else if (cbc.getdUserSector().equals( "tecnicos" ) || cbc.getdUserSector().equals( "usuarios interior" )) {
             navigationView.getMenu().setGroupVisible( R.id.menu_tecnicos, true );
         } else if (cbc.getdUserSector() .equals( "cac" ) || cbc.getdUserSector() .equals( "deposito" )) {
             navigationView.getMenu().setGroupVisible( R.id.menu_logistica, true );
@@ -307,12 +332,39 @@ public class HomeActivity extends AppCompatActivity
         transition.commit();
     }
 
-    void Home()
+    void RutaDia()
+    {
+
+
+        Toast.makeText( this, "RUTA DEL DIA", Toast.LENGTH_SHORT ).show();
+        webUse=true;
+        fragmentUse=true;
+        mapRutaDiaFragment  webdct= new mapRutaDiaFragment();
+        if (( cbc.getdUserSector().equals( "super admin" )) || ( cbc.getdUserSector().equals( "direccion" )) ||  ( cbc.getdUserSector().equals( "comercial" ))) {
+
+
+            Bundle bundle = new Bundle();
+            bundle.putString( "dato_aux", "https://tecnicos.cbcgroup.com.ar/test/app_android/Desarrollo/web/html/map.html?nameTec=superAdmin" );
+            webdct.setArguments( bundle );
+        }
+        FragmentTransaction transition= getSupportFragmentManager().beginTransaction();
+        transition.replace(R.id.contenedor,webdct);
+        transition.addToBackStack(null);
+        transition.commit();
+    }
+
+    private void Home()
     {
 
         webUse=false;
         fragmentUse=false;
+
         HomeFragmento();
+    }
+
+    private void UltimoInicioDeSesion()
+    {
+        Log.w(TAG,"ultimoInicioDeSesion");
     }
 
     @Override
@@ -339,7 +391,6 @@ public class HomeActivity extends AppCompatActivity
 
 
         }
-        Log.w(TAG,"AFUUERA AFUERA");
         return false;
      /*   if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (keyCode) {
@@ -357,5 +408,36 @@ public class HomeActivity extends AppCompatActivity
 */
 
 
+    }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void scheduleJob() {
+        JobInfo myJob = new JobInfo.Builder(0, new ComponentName(this, NetworkSchedulerService.class))
+                .setRequiresCharging(true)
+                .setMinimumLatency(1000)
+                .setOverrideDeadline(2000)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPersisted(true)
+                .build();
+
+        JobScheduler jobScheduler = (JobScheduler) getSystemService( Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(myJob);
+    }
+
+    @Override
+    protected void onStop() {
+        // A service can be "started" and/or "bound". In this case, it's "started" by this Activity
+        // and "bound" to the JobScheduler (also called "Scheduled" by the JobScheduler). This call
+        // to stopService() won't prevent scheduled jobs to be processed. However, failing
+        // to call stopService() would keep it alive indefinitely.
+        stopService(new Intent(this, NetworkSchedulerService.class));
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Start service and provide it a way to communicate with this class.
+        Intent startServiceIntent = new Intent(this, NetworkSchedulerService.class);
+        startService(startServiceIntent);
     }
 }

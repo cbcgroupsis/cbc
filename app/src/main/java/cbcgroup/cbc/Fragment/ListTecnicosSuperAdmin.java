@@ -2,6 +2,8 @@ package cbcgroup.cbc.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -29,34 +32,36 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
+import cbcgroup.cbc.Activity.TecnicosOut;
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.Insumos.AdapterInsumos;
 import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
+import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
+import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
+import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ListTecnicosSuperAdmin.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ListTecnicosSuperAdmin#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class ListTecnicosSuperAdmin extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    /**db*/
+    private SQLite sql;
+    private ConnSQLiteHelper con;
 
     private OnFragmentInteractionListener mListener;
     public static final String TAG = "TecnicosSuperAdmin_Fragment";
     private String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicosSuperAdmin.php";
     private android.support.v7.widget.SearchView searchView;
     private RecyclerView recyclerView;
+    private ImageButton actualizar;
     ListInsumo insumos = new ListInsumo();
     AdapterInsumos adapter;
     CBC cbc;
@@ -97,12 +102,27 @@ public class ListTecnicosSuperAdmin extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate( R.layout.fragment_list_tecnicos_super_admin, container, false );
+        con =  new ConnSQLiteHelper( getContext());
+        sql = new SQLite();
         searchView=view.findViewById( R.id.mSearch );
         recyclerView=view.findViewById( R.id.myRecycler );
+        actualizar=view.findViewById( R.id.actualizar );
         recyclerView.setLayoutManager( new LinearLayoutManager( getActivity() ) );
         recyclerView.setItemAnimator( new DefaultItemAnimator() );
         cbc=new CBC(getActivity());
-        Programa();
+        actualizar.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                if(cbc.Internet())Programa();
+                else Toast.makeText( getContext(),"No tiene Acceso Internet para Actualizar la Lista",Toast.LENGTH_LONG ).show();
+            }
+        } );
+
+        if(TableValues()) Programa();
+        else ProgramaSinInternet();
+
+
         return view;
     }
 
@@ -129,17 +149,6 @@ public class ListTecnicosSuperAdmin extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -158,6 +167,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
                 JSONObject obj=jsonInsumos.getJSONObject( a );
                 insumos=new ListInsumo();
                 insumos.setOneDate(obj.getString( "nombre" ));
+                SincronizarDbLocal( obj.getString( "nombre" ),obj.getString( "idTecnico" ));
                 list.add(insumos);
             }
             adapter=new AdapterInsumos(getActivity(),list,3);
@@ -196,6 +206,8 @@ public class ListTecnicosSuperAdmin extends Fragment {
                     @Override
                     public void onResponse(String s)
                     {
+                        SQLiteDatabase db=con.getWritableDatabase();
+                        sql.DeleteTabla( db, dbNombresTecSa.TABLE );
                         cbc.progressDialogCancel();
                         Log.w(TAG,"Resp:"+s);
                         List( s );
@@ -219,12 +231,63 @@ public class ListTecnicosSuperAdmin extends Fragment {
             protected Map<String, String> getParams()
             {
                 Map<String, String> params = new Hashtable<>();
-                params.put("Content-Type","application/json; charset=utf-8");
-                //     params.put("dato",getActivity().getIntent().getExtras().getString( "npedido" ));
                 return params;
             }
 
         };
         requestQueue.add(stringRequest);
     }
+    private void SincronizarDbLocal(String nombres,String idTec)
+    {
+        SQLiteDatabase db=con.getWritableDatabase();
+        Map params = new Hashtable(  );
+        params.clear();
+        params.put(dbNombresTecSa.CAMPO_NOMBRES,nombres);
+        params.put(dbNombresTecSa.CAMPO_IDTEC,idTec);
+        sql.Add(db,dbNombresTecSa.TABLE,params);
+
+    }
+    private void ProgramaSinInternet()
+    {
+        final ArrayList<ListInsumo> list=new ArrayList<>();
+        list.clear();
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="SELECT * FROM "+ dbNombresTecSa.TABLE;
+        Cursor resp=db.rawQuery( SQL,null);
+        Log.w("LIST","lista:"+resp.getCount());
+        for(int i=0;i<resp.getCount();i++)
+        {
+            if(resp.moveToPosition( i ))
+            {
+                insumos=new ListInsumo();
+                insumos.setOneDate(resp.getString(0));
+                list.add(insumos);
+                Log.w("LIST","lista:"+resp.getString(0));
+            }
+        }
+        adapter=new AdapterInsumos(getActivity(),list,3);
+        recyclerView.setAdapter(adapter);
+        db.close();
+        Search();
+    }
+
+
+    boolean TableValues()
+    {
+        SQLiteDatabase db = con.getWritableDatabase();
+        String SQL = "";
+        String idParte="";
+        SQL = "SELECT * FROM " + dbNombresTecSa.TABLE;
+        Cursor resp = db.rawQuery( SQL, null );
+        if (resp.moveToPosition( 0 )) {
+
+            idParte = resp.getString( 0 );
+        }
+        db.close();
+        if (resp.getCount() != 0 && resp!=null)
+        {
+            return false;
+        }else return true;
+    }
+    //
 }

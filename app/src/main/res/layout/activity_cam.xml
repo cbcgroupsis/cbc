@@ -34,7 +34,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
                 android:src="@drawable/img_icono_camara"
-                android:background="@drawable/rounded_textviewa" />
+                android:background="@drawable/rounded_textviewa"
+    />
 
             <TextView
                 android:layout_width="match_parent"

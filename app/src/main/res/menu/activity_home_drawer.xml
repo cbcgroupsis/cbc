@@ -30,6 +30,10 @@
                     android:id="@+id/tecnicos_tecnicos"
                     android:icon="@drawable/img_icono_tecnico"
                     android:title="Tecnicos" />
+                <item
+                    android:id="@+id/ruta_dia"
+                    android:icon="@drawable/img_icono_map"
+                    android:title="Ruta del dia" />
             </menu>
         </item>
     </group>

@@ -7,6 +7,7 @@
     tools:context=".Activity.LoginActivity">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -14,6 +15,7 @@
         android:background="@drawable/gradient_color">
 
         <RelativeLayout
+            android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.6" >
@@ -47,7 +49,10 @@
                     android:hint="@string/login_user_name"
                     android:textColorHint="#7986CB"
                     android:inputType="textPersonName"
-                    android:textColor="#ffffff"/>
+                    android:textColor="#ffffff"
+
+                    />
+                <requestFocus/>
             </android.support.design.widget.TextInputLayout>
 
             <!--********************************** PASSWORD *************************************-->
@@ -66,7 +71,10 @@
                     android:inputType="textPassword"
                     android:textColor="#ffffff"
                     android:background="#42A5F5"
+
                     />
+                <requestFocus/>
+            </android.support.design.widget.TextInputLayout>
                 <CheckBox
                     android:id="@+id/login_checkbox"
                     android:layout_width="wrap_content"
@@ -85,9 +93,10 @@
                     android:textColorHint="#ffffff"
                     android:background="#2196F3"
                     />
-            </android.support.design.widget.TextInputLayout>
+
         </LinearLayout>
 
+        <requestFocus />
 
     </LinearLayout>
 

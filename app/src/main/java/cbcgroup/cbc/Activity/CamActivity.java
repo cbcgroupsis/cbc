@@ -6,8 +6,10 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -37,6 +39,10 @@ import java.util.Map;
 
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
+import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
+import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbInsumosSinInternet;
+import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -58,7 +64,8 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
     private String imageurl;
     /////////////////////////////////////////////
     String nombre,serie;
-
+    private SQLite sql;
+    private ConnSQLiteHelper con;
 
 
 
@@ -66,6 +73,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_cam );
         txvCliente=findViewById( R.id.txvCliente );
@@ -76,6 +84,8 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         btnEnviar.setOnClickListener( this );
         imgInsumos.setOnClickListener( this );
         cbc = new CBC(CamActivity.this);
+        con =  new ConnSQLiteHelper( this);
+        sql = new SQLite();
         CargarInfo();
 
 
@@ -87,6 +97,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         {
             Log.w(TAG,"btnCam funciona");
             SubirImagen();
+
 
         }
         if(v==imgInsumos)
@@ -141,7 +152,8 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                uploadImage();
+            if(cbc.Internet()) uploadImage();
+            else GuardarInformacion();
 
             }
         });
@@ -179,7 +191,36 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
                         }
 
                     }
+
+                    /***/
                 }
+                break;
+            case 0:
+                if (requestCode == 0) {
+
+                    // si tout s'est bien passee
+                    if (resultCode == CamActivity.RESULT_OK) {
+
+                        // contents est la valeur contenue dans notre code barre ou QR
+
+                        String contents = data.getStringExtra("SCAN_RESULT");
+
+                        Toast.makeText(this,"Valeur decryptee : "+contents, Toast.LENGTH_LONG).show();
+                        Log.w(TAG,contents);
+
+                    }
+
+                    // si operation annulee
+                    if(resultCode == CamActivity.RESULT_CANCELED){
+
+                        Toast.makeText(this,"Operation annulee", Toast.LENGTH_LONG).show();
+
+                    }
+
+                }
+                break;
+
+
         }
     }
 
@@ -231,8 +272,10 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
                     public void onErrorResponse(VolleyError volleyError)
                     {
                         loading.dismiss();
-                        Toast.makeText(CamActivity.this, "Error: No se pudo subir la imagen", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(CamActivity.this, "Error: No se pudo subir la imagen", Toast.LENGTH_LONG).show();
+
                         //Toast.makeText( Cam.this,volleyError.toString(),Toast.LENGTH_LONG ).show();
+                        GuardarInformacion();
 
                     }
                 })
@@ -261,5 +304,24 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         requestQueue.add(stringRequest);
     }
 
-
+    private void GuardarInformacion()
+    {
+        Bitmap foto;
+        String imagen="";
+        Bundle extra= getIntent().getExtras();
+        if(thumbnail!=null)
+        {
+            foto = Bitmap.createScaledBitmap(thumbnail, 500, 500, true);
+            imagen = getStringImagen( foto);
+        }
+        Map<String, String> params = new Hashtable<>();
+        params.clear();
+        params.put( dbInsumosSinInternet.CAMPO_FOTO, imagen);
+        params.put(dbInsumosSinInternet.CAMPO_SERIE,extra.getString( "numSerie" ));
+        params.put(dbInsumosSinInternet.CAMPO_NOMBRE, cbc.getdUserName());
+        params.put(dbInsumosSinInternet.CAMPO_NPEDIDO,cbc.getInsumosNpedidos());
+        SQLiteDatabase db=con.getWritableDatabase();
+        sql.Add(db, dbInsumosSinInternet.TABLE,params);
+        startActivity( new Intent(this,HomeActivity.class ).putExtra( "homeStart","homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ));
+    }
 }

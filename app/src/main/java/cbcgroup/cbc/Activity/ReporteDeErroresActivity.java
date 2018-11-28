@@ -7,8 +7,10 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -22,6 +24,7 @@ import com.android.volley.toolbox.Volley;
 import java.util.Hashtable;
 import java.util.Map;
 
+import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
 
 public class ReporteDeErroresActivity extends AppCompatActivity implements View.OnClickListener {
@@ -31,7 +34,9 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
     String mail;
     String mensaje;
     EditText editText;
-    Button btnEnviar;
+    private Button btnEnviar;
+    private LinearLayout linearLayout;
+    private CBC cbc;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -40,7 +45,10 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
         editText=findViewById( R.id.mensajeReporet );
         info=getSharedPreferences( "userInfo",MODE_PRIVATE );
         btnEnviar=findViewById( R.id.btnRepor );
+        linearLayout=findViewById( R.id.linearLayoutReporteDeErrores );
+        linearLayout.setOnClickListener( this );
         btnEnviar.setOnClickListener( this );
+        cbc=new CBC(this);
     }
 
     @Override
@@ -48,8 +56,8 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
     {
         if(v==btnEnviar)
         {
-            nombre=info.getString( "name" ,"");
-            mail=info.getString("mail","");
+            nombre=cbc.getdUserName();
+            mail=cbc.getdUserEmail();
             mensaje=editText.getText().toString();
 
             if(!mensaje.matches( "" ) )
@@ -80,6 +88,14 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
                 AlertDialog alertDialog=alertDialogBuilder.create();
                 alertDialog.show();
             }else Toast.makeText( ReporteDeErroresActivity.this,"Ingrese un texto",Toast.LENGTH_LONG ).show();
+        }
+        if(linearLayout==v)
+        {
+            View view = this.getCurrentFocus();
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(LoginActivity.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
     }
 

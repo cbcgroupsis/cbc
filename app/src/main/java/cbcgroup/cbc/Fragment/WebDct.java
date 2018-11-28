@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +82,11 @@ public class WebDct extends Fragment {
             urll=getArguments().getString( "dato_aux",null );
         }else
         {
-            urll="https://tecnicos.cbcgroup.com.ar/test/login.aspx";
+            urll="https://tecnicos.cbcgroup.com.ar/test/login.aspx?__VIEWSTATE=%2FwEPDwUKMTQ3NDgwNDQ4OA9kFgICAw9kFgICAQ9kFgICAQ9kFgICAQ8PFgIeBFRleHQFEjIwLzExLzIwMTggOTo1NzowNGRkZBRI7Jzs%2BsVwutKBUlB30FtZU7Hq&__VIEWSTATEGENERATOR=930D1C2E&__EVENTVALIDATION=%2FwEWBQKL87bQCwLs0bLrBgLs0fbZDAKxi96RBQLWlM%2BbAluGhrPTQx0Dlu09jjr5rhUraKn%2F&TextBox1=" +
+                    cbc.getdUserName() +
+                    "&TextBox2=" +
+                    cbc.getdUserPassword() +
+                    "&Button3=Iniciar+Sesi%C3%B2n";
         }
     }
 
