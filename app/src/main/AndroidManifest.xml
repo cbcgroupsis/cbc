@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="cbcgroup.cbc" >
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,7 +20,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_cbc"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".Activity.LoginActivity"
             android:configChanges="screenSize|orientation"
             android:windowSoftInputMode="stateHidden">
@@ -38,6 +40,7 @@
         <activity android:name=".Activity.TecnicoIn" />
         <activity android:name=".Activity.TecnicosActivity" />
         <activity android:name=".Activity.TecnicosOut"
+
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden">
         </activity>
         <service

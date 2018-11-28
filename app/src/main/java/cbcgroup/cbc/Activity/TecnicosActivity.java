@@ -76,7 +76,6 @@ public class TecnicosActivity  extends AppCompatActivity
             }
         } );
 
-
     }
     void List(String  res)
     {
@@ -194,7 +193,9 @@ public class TecnicosActivity  extends AppCompatActivity
         final ArrayList<ListInsumo> list=new ArrayList<>();
         list.clear();
         SQLiteDatabase db = con.getReadableDatabase();
+
         String SQL="SELECT nParte,Cliente,Categoria FROM "+ dbTecnicos.TABLE + " WHERE Ingreso!=2 AND idTec='"+idTec+"'";
+
         Cursor resp=db.rawQuery( SQL,null);
         Log.w("LIST","lista:"+resp.getCount());
         for(int i=0;i<resp.getCount();i++)
