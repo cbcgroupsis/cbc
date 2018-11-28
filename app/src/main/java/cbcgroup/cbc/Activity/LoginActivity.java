@@ -17,7 +17,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.firebase.iid.FirebaseInstanceId;
+
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private CheckBox sesion;
     private CBC cbc;
     private LinearLayout linearLayout;
-    private String token;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         linearLayout.setOnClickListener( this );
         cbc= new CBC(LoginActivity.this);
         if(cbc.getSession())HomeStart();                                                            //Verifico si la sesion esta guardad.Si es asi, directamente voy a la pantalla principal (home)
-        token= FirebaseInstanceId.getInstance().getToken();                                         //Lectura del identificador unico del celular.
+
 
 
 
