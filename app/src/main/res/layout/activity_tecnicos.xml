@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#E5E5E5"
     tools:context=".Activity.TecnicosActivity">
     <LinearLayout
         android:id="@+id/list"
@@ -16,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:orientation="horizontal"
+            android:background="@color/cardview_light_background"
             android:weightSum="1"
             >
             <android.support.v7.widget.SearchView

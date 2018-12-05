@@ -11,6 +11,7 @@ public class dbTecnicos
             "[Categoria] TEXT  NOT NULL,\n"+
         "[FechaVence] TEXT  NOT NULL,\n"+
         "[Fecha] TEXT  NOT NULL,\n"+
+            "[horaVence] TEXT   NULL,\n"+
             "[Modelo] TEXT  NOT NULL,\n"+
             "[Ingreso] TEXT   NULL,\n"+
         "[Inconveniente] TEXT  NOT NULL\n"+
@@ -28,4 +29,5 @@ public class dbTecnicos
     public static String CAMPO_INGRESO="Ingreso";
     public static String CAMPO_IDTEC="idTec";
     public static String CAMPO_CATEGORIA="Categoria";
+    public static String CAMPO_HORAVENCE="horaVence";
 }

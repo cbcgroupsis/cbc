@@ -6,8 +6,8 @@ android {
         applicationId "angel.cbcgroup"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 37
-        versionName "1.1.1.1.21"
+        versionCode 38
+        versionName "1.1.1.1.22"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -38,6 +38,9 @@ dependencies {
 
     //Detectar si hay conectividad a internet.
     implementation 'com.evernote:android-job:1.2.6'
+    //Notificacion
+    implementation "com.android.support:support-compat:27.0.0"
+
 
 
 }

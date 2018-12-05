@@ -27,9 +27,7 @@
             android:gravity="center"
             android:hint="25"
             android:textColor="@android:color/black" />
-
-
-
+        
         <TextView
             android:id="@+id/insumosNombreCliente"
             android:layout_width="180dp"

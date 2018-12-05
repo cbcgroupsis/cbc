@@ -68,6 +68,7 @@
                 android:id="@+id/tec_subItem_sector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:scrollbars="vertical"
                 android:background="@drawable/rounded_textviewa" />
 
             <TextView
@@ -179,6 +180,7 @@
                                 android:id="@+id/TviajeHora"
                                 android:layout_width="90px"
                                 android:layout_height="50px"
+                                android:maxLength="2"
                                 android:autoSizeMaxTextSize="100sp"
                                 android:autoSizeMinTextSize="1sp"
                                 android:autoSizeStepGranularity="1sp"
@@ -186,6 +188,7 @@
                                 android:background="@drawable/rounded_textviewa"
                                 android:gravity="center"
                                 android:hint="hh"
+                                android:imeOptions="actionNext"
                                 android:inputType="datetime"/>
                             <TextView
                                 android:layout_width="wrap_content"
@@ -197,6 +200,7 @@
                                 android:id="@+id/TviajeMinutos"
                                 android:layout_width="90px"
                                 android:layout_height="50px"
+                                android:maxLength="2"
                                 android:autoSizeMaxTextSize="100sp"
                                 android:autoSizeMinTextSize="1sp"
                                 android:autoSizeStepGranularity="1sp"
@@ -204,6 +208,7 @@
                                 android:background="@drawable/rounded_textviewa"
                                 android:gravity="center"
                                 android:hint="mm"
+                                android:imeOptions="actionDone"
                                 android:inputType="datetime"/>
 
 

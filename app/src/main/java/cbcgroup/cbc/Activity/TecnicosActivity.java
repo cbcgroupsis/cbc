@@ -99,11 +99,13 @@ public class TecnicosActivity  extends AppCompatActivity
                 String sector= obj.getString( "sector" );
                 String ingreso=obj.getString("ingreso");
                 String categoria=obj.getString("categoria");
-                SincronizarDbLocal(npedido,cliente,nSerie,sector,fVence,fecha,ingreso,modelo,inconveniente,categoria);
+                String horaVence=obj.getString("horaVence");
+                SincronizarDbLocal(npedido,cliente,nSerie,sector,fVence,fecha,ingreso,modelo,inconveniente,categoria,horaVence);
                 insumos=new ListInsumo();
                 insumos.setNumPedido(npedido);
                 insumos.setNombreCliente( cliente );
                 insumos.setCategoria( categoria );
+                insumos.setHoraVence( horaVence );
                 list.add(insumos);
 
             }
@@ -193,8 +195,7 @@ public class TecnicosActivity  extends AppCompatActivity
         final ArrayList<ListInsumo> list=new ArrayList<>();
         list.clear();
         SQLiteDatabase db = con.getReadableDatabase();
-
-        String SQL="SELECT nParte,Cliente,Categoria FROM "+ dbTecnicos.TABLE + " WHERE Ingreso!=2 AND idTec='"+idTec+"'";
+        String SQL="SELECT nParte,Cliente,Categoria,horaVence FROM "+ dbTecnicos.TABLE + " WHERE Ingreso!=2 AND idTec='"+idTec+"'";
 
         Cursor resp=db.rawQuery( SQL,null);
         Log.w("LIST","lista:"+resp.getCount());
@@ -206,6 +207,7 @@ public class TecnicosActivity  extends AppCompatActivity
                 insumos.setNumPedido(resp.getString( 0 ));
                 insumos.setNombreCliente( resp.getString( 1 ) );
                 insumos.setCategoria( resp.getString( 2 ) );
+                insumos.setHoraVence( resp.getString( 3 ) );
                 list.add(insumos);
 
             }
@@ -215,7 +217,7 @@ public class TecnicosActivity  extends AppCompatActivity
         db.close();
         Search();
     }
-    private void SincronizarDbLocal(String nParte,String Cliente,String Serie,String Sector, String Fvence, String fecha, String Ingreso,String Modelo, String Inconveniente,String categoria)
+    private void SincronizarDbLocal(String nParte,String Cliente,String Serie,String Sector, String Fvence, String fecha, String Ingreso,String Modelo, String Inconveniente,String categoria,String horaVence)
     {
         Bundle extra= getIntent().getExtras();
         if(extra!=null) idTec=extra.getString( "idTec" );
@@ -234,6 +236,7 @@ public class TecnicosActivity  extends AppCompatActivity
         params.put( dbTecnicos.CAMPO_MODELO,Modelo);
         params.put(dbTecnicos.CAMPO_IDTEC,idTec);
         params.put(dbTecnicos.CAMPO_CATEGORIA,categoria);
+        params.put(dbTecnicos.CAMPO_HORAVENCE,horaVence);
         sql.Add(db,dbTecnicos.TABLE,params);
 
     }
