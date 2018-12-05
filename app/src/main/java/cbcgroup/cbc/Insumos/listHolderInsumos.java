@@ -9,7 +9,7 @@ import cbcgroup.cbc.R;
 
 public class listHolderInsumos extends RecyclerView.ViewHolder implements View.OnClickListener
 {
-    public TextView numPedido,nombreCliente,numSerie,modelo,oneDate,categoria;
+    public TextView numPedido,nombreCliente,numSerie,modelo,oneDate,categoria,horaVence;
     ItemClickListener itemClickListener;
     public listHolderInsumos(View itemView,int List)
     {
@@ -31,6 +31,7 @@ public class listHolderInsumos extends RecyclerView.ViewHolder implements View.O
             numPedido=itemView.findViewById( R.id.insumosNpedido );
             nombreCliente=itemView.findViewById( R.id.insumosNombreCliente );
             categoria=itemView.findViewById( R.id.Categoria);
+            horaVence=itemView.findViewById( R.id.insumosHoraVence );
         }
 
         itemView.setOnClickListener( this );

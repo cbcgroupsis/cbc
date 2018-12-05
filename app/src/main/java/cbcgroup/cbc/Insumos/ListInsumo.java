@@ -9,6 +9,15 @@ public class ListInsumo
     String oneDate;
     String idTec;
     String categoria;
+    String horaVence;
+
+    public String getHoraVence() {
+        return horaVence;
+    }
+
+    public void setHoraVence(String horaVence) {
+        this.horaVence = horaVence;
+    }
 
     public String getCategoria() {
         return categoria;

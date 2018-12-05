@@ -1,10 +1,17 @@
 package cbcgroup.cbc.Activity;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -25,6 +32,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -40,6 +51,8 @@ import cbcgroup.cbc.dbLocal.Tablas.dbTecnicos;
 public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
 {
     private static final String TAG = "TecnicosInActivity";
+    private static final String CHANNEL_ID = "test";
+    private int NOTIFICATION_ID =0 ;
     String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/hoja_de_reparacion.php?";
     String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
     TextView serie,sector,fecha,modelo,inconveniente,fechaVencimiento;
@@ -47,6 +60,8 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
     String nombre;
     Bundle extra;
     CBC cbc;
+    NotificationCompat.Builder builder;
+
     private SQLite sql;
     private ConnSQLiteHelper con;
     @Override
@@ -66,6 +81,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         cbc= new CBC(TecnicoIn.this);
         con =  new ConnSQLiteHelper( this);
         sql = new SQLite();
+        builder = new NotificationCompat.Builder(this);
         extra=getIntent().getExtras();
         CompleteInfo();
     }
@@ -76,6 +92,11 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         if(v==button)
         {
             IngresoPedido();
+
+            /*DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm");
+            String date = df.format(Calendar.getInstance().getTime());
+            Log.w("HORA",date);*/
+
         }
     }
 
@@ -92,7 +113,6 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
             {
                 Ingreso();
                 ingresoQuery();
-
 
             }
         });
@@ -119,6 +139,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
                     {
                         //cbc.setIngresoTecnico(true);
                         //cbc.setIngresonpedido( extra.getString( "npedido" ));
+                        sendNotificaction();
                         Toast.makeText( TecnicoIn.this, "Se ingreso correctamente!", Toast.LENGTH_SHORT ).show();
                         startActivity( new Intent(TecnicoIn.this,HomeActivity.class ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP ));
                     }
@@ -188,6 +209,80 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
             Log.w("LSITATEST","error->"+e.toString());
         }
 
+        db.close();
+    }
+
+
+
+    private void pedidosSinCerrar()
+    {
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="SELECT nParte,Cliente "+dbTecnicos.TABLE+" WHERE Ingreso='1'";
+        try
+        {
+            Cursor resp=db.rawQuery( SQL,null );
+            for(int a=0;a<resp.getCount();a++)
+            {
+                if(resp.moveToPosition( a ))
+                {
+                    String nParte=resp.getString(0);
+                    String cliente=resp.getString( 1 );
+
+                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                            .setSmallIcon(R.mipmap.ic_cbc)
+                            .setContentTitle("My notification")
+                            .setContentText("Much longer text that cannot fit one line...")
+                            .setStyle(new NotificationCompat.BigTextStyle()
+                                    .bigText("Much longer text that cannot fit one line..."))
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+                }
+            }
+
+        }catch (Exception e)
+        {
+            Log.w("LSITATEST","error->"+e.toString());
+        }
+
+        db.close();
+    }
+    private void sendNotificaction()
+    {
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="SELECT nParte,Cliente FROM Tecnicos WHERE Ingreso='1';";
+        try
+        {
+            Cursor resp=db.rawQuery( SQL,null );
+            for(int a=0;a<resp.getCount();a++)
+            {
+                if(resp.moveToPosition( a ))
+                {
+                    Log.w("INGRESO","resp->"+resp.getString( 0 ));
+                    Intent notificationIntent = new Intent(this, TecnicosOut.class);
+                    notificationIntent.putExtra("npedido",resp.getString( 0 ));
+                    notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            builder.setSmallIcon(R.mipmap.ic_cbc)
+                            .setAutoCancel(true)
+                            .setColor(getResources().getColor(R.color.colorPrimary))
+                            .setGroup("CBCGROUP")
+                            .setPriority(2)
+                            .setContentText("Se encuentra sin cerrar, por favor termine de cerrar el parte.")
+                            .setContentIntent(PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                            .setWhen(System.currentTimeMillis())
+                            .setContentTitle("El parte "+resp.getString( 0 )+" de "+resp.getString( 1 ))
+                            .setDefaults(Notification.DEFAULT_ALL);
+                    NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+                    notificationManager.notify(++NOTIFICATION_ID,builder.build());
+
+
+                }
+            }
+
+
+        }catch(Exception e)
+        {
+            Log.w(TAG,"Error Notificacion->"+e);
+        }
         db.close();
     }
 

@@ -540,8 +540,11 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     void CompleteInfo()
     {
         String nparte= extra.getString( "npedido" );
+        Intent intent=getIntent();
+        String lala= intent.getStringExtra( "npedido" );
+        Log.w("NOTIFICACION","result->"+lala);
         SQLiteDatabase db = con.getReadableDatabase();
-        String SQL="SELECT nParte,Cliente,nSerie,Sector,FechaVence,Fecha,Modelo,Inconveniente,Ingreso FROM "+ dbTecnicos.TABLE+ " WHERE nParte='"+nparte+"'";
+        String SQL="SELECT nParte,Cliente,nSerie,Sector,FechaVence,Fecha,Modelo,Inconveniente,Ingreso FROM "+ dbTecnicos.TABLE+ " WHERE nParte='"+nparte+"' AND Ingreso=1";
         Cursor resp=db.rawQuery( SQL,null);
         if(resp.moveToPosition( 0))
         {
@@ -558,7 +561,11 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
             }else Log.w("LISTATEST","ingreso->VALOR NULL");
 
 
-        }
+        }else
+            {
+                cbc.Msj( "El parte ya se encuentra cerrado." );
+                finish();
+            }
 
         db.close();
         Log.w(TAG,"INFORMACION COMPELTADA POR DB");
@@ -568,6 +575,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     {
         String nparte= extra.getString( "npedido" );
         SQLiteDatabase db = con.getReadableDatabase();
+
         String SQL="UPDATE "+dbTecnicos.TABLE+" SET Ingreso='2' WHERE nParte='"+ nparte+"'";
         try
         {

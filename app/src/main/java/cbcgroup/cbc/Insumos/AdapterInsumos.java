@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -126,6 +127,22 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
                 holder.numPedido.setText( insumos.get( pos ).getNumPedido() );
                 holder.nombreCliente.setText( insumos.get( pos ).getNombreCliente() );
                 holder.categoria.setText(insumos.get(pos).getCategoria());
+                holder.horaVence.setText(insumos.get( pos ).getHoraVence());
+
+                final String npedido = insumos.get( pos ).getNumPedido();
+                SQLiteDatabase db = con.getReadableDatabase();
+                String SQL="SELECT Ingreso FROM "+ dbTecnicos.TABLE+ " WHERE nParte='"+npedido+"'";
+                Cursor resp=db.rawQuery( SQL,null);
+                if(resp.moveToPosition( 0))
+                {
+                    if(!resp.getString( 0 ).equals( "" )) holder.categoria.setBackgroundColor( Color.RED );
+                }
+                db.close();
+
+
+
+
+
 
                 holder.itemClickListener( new ItemClickListener() {
                     @Override

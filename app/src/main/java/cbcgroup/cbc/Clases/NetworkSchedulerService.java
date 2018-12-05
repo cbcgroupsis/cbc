@@ -79,6 +79,7 @@ public class NetworkSchedulerService extends JobService implements
     public void onNetworkConnectionChanged(boolean isConnected)
     {
         String message;
+
         if(isConnected)
         {
             //message="Conectado a internet";

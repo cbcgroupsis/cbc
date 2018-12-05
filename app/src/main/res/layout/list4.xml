@@ -3,51 +3,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="9dp"
+        android:orientation="vertical">
+
+    <RelativeLayout
+
+        android:background="#fff"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginVertical="3dp"
         android:id="@+id/relative"
         >
         <TextView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:text="A"
+
+            android:id="@+id/Categoria"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:textSize="30sp"
             android:background="@drawable/rounded_textview"
             android:textColor="@android:color/white"
             android:gravity="center"
-            android:id="@+id/Categoria"   />
-
+            android:text="7"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="10dp"
+            />
         <TextView
             android:id="@+id/insumosNpedido"
-            android:layout_width="100dp"
-            android:layout_height="80dp"
-            android:layout_toRightOf="@id/Categoria"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMinTextSize="12sp"
-            android:autoSizeMaxTextSize="100sp"
-            android:autoSizeStepGranularity="2sp"
-            android:gravity="center"
-            android:hint="25"
-            android:textColor="@android:color/black" />
-
-
-
+            android:layout_width="85dp"
+            android:layout_height="20dp"
+            android:background="#FFFFFF"
+            android:text="123456789"
+            android:textColor="#000000"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginVertical="1dp"
+            android:layout_toRightOf="@+id/Categoria"/>
         <TextView
             android:id="@+id/insumosNombreCliente"
-            android:layout_width="180dp"
-            android:layout_height="80dp"
-            android:layout_toRightOf="@id/insumosNpedido"
-
-            android:autoSizeMaxTextSize="100sp"
-            android:autoSizeMinTextSize="1sp"
-            android:autoSizeStepGranularity="1sp"
+            android:layout_width="170dp"
+            android:layout_height="55dp"
+            android:background="#FFFFFF"
+            android:text="COMERCIALIZADORA DE BIENES DE CAPITAL"
             android:autoSizeTextType="uniform"
-            android:gravity="center_vertical"
-            android:hint="N_cliente"
-            android:textColor="@android:color/black" />
+            android:layout_marginLeft="4dp"
+            android:layout_marginVertical="1dp"
+            android:layout_below="@+id/insumosNpedido"
+            android:scrollHorizontally="true"
+            android:layout_toRightOf="@+id/Categoria"/>
 
+        <TextView
+            android:id="@+id/insumosHoraVence"
+            android:layout_width="130dp"
+            android:layout_height="20dp"
+            android:layout_below="@+id/insumosNpedido"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/insumosNombreCliente"
+            android:hint="dd/mm/yyyy mm:hh"
+            android:inputType="time"
+            android:textAlignment="center"
+
+            />
     </RelativeLayout>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
