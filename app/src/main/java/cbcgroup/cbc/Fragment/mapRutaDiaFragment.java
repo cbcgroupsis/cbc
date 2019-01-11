@@ -4,9 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -38,14 +36,12 @@ public class mapRutaDiaFragment extends Fragment
     ProgressDialog progress;
 
     String dato_aux;
-    String urll;
+    private String urll;
     ViewTreeObserver.OnScrollChangedListener mOnScrollChangedListener;
     SharedPreferences menu;
-    ProgressBar progressBar;
-    WebView mWebView;
-    SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressBar progressBar;
+    private WebView mWebView;
     int upCont=0;
-    CBC cbc;
 
     public mapRutaDiaFragment() {
         // Required empty public constructor
@@ -72,15 +68,15 @@ public class mapRutaDiaFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        cbc = new CBC(this.getActivity());
+        CBC cbc = new CBC( this.getActivity() );
 
         if (getArguments() != null)
         {
             urll=getArguments().getString( "dato_aux",null );
         }else
             {
-                String idTec=cbc.getdUserId();
-                String nameTec=cbc.getdUserName();
+                String idTec= cbc.getdUserId();
+                String nameTec= cbc.getdUserName();
                 urll="https://tecnicos.cbcgroup.com.ar/test/app_android/Desarrollo/web/html/map.html?idTec="+idTec+"&nameTec="+nameTec;
 
         }
@@ -98,16 +94,16 @@ public class mapRutaDiaFragment extends Fragment
         mWebView =  view.findViewById( R.id.web_frag_dct );
         Programa_principal();
 
-        swipeRefreshLayout = view.findViewById( R.id.swipe_web_dct );
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById( R.id.swipe_web_dct );
         swipeRefreshLayout.setRefreshing(false);
         swipeRefreshLayout.setEnabled(false);
         return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed() {
         if (mListener != null) {
-            mListener.onFragmentInteraction( uri );
+            mListener.onFragmentInteraction();
         }
     }
 
@@ -140,10 +136,10 @@ public class mapRutaDiaFragment extends Fragment
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction();
     }
 
-    void Programa_principal()
+    private void Programa_principal()
     {
 
         progressBar.getIndeterminateDrawable().setColorFilter(0xff2196F3, PorterDuff.Mode.SRC_IN );

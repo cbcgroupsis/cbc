@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
@@ -33,14 +33,13 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
 {
     private static final String TAG = "AdapterInsumos";
     private String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/test.php?";
-    private Context ctx;
-    ArrayList<ListInsumo> insumos,filterList;
+    private final Context ctx;
+    public ArrayList<ListInsumo> insumos;
+    private final ArrayList<ListInsumo> filterList;
     private CustomFilter filter;
     private int List=1;
-    private int pos=0;
-    private CBC cbc;
-    private SQLite sql;
-    private ConnSQLiteHelper con;
+    private final CBC cbc;
+    private final ConnSQLiteHelper con;
 
     public AdapterInsumos(Context ctx, ArrayList<ListInsumo> insumos, int list) {
         this.ctx = ctx;
@@ -49,7 +48,7 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
         this.List=list;
         cbc=new CBC( ctx );
         con =  new ConnSQLiteHelper( ctx);
-        sql = new SQLite();
+        SQLite sql = new SQLite();
     }
 
     @NonNull
@@ -57,14 +56,12 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
     public listHolderInsumos onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View v=null;
-        if(List==1) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list1,null );
-        if(List==2) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list2_subitem,null );
-        if(List==3)v = LayoutInflater.from(parent.getContext()).inflate( R.layout.list3_onedate,null );
-        if(List==4) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list4,null );
+        if(List==1) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list1,parent,false );
+        if(List==2) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list2_subitem,parent,false );
+        if(List==3)v = LayoutInflater.from(parent.getContext()).inflate( R.layout.list3_onedate,parent,false );
+        if(List==4) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list4,parent,false );
 
-        listHolderInsumos holder= new listHolderInsumos( v,List);
-
-        return holder;
+        return new listHolderInsumos( v,List);
     }
 
     @Override
@@ -74,30 +71,29 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
             //LiST 2: INSUMOS SUB ITEM -> modelo, numero de serie
             //LiST 3: TECNICOS SUPER ADMIN -> nombre de todos los tec
             //LIST 4: TECNICOS PEDIDOS -> Pedidos tecnicos, Npedido,cliente
-            pos=position;
-            if(List==1)
+        if(List==1)
             {
-                holder.numPedido.setText( insumos.get( pos ).getNumPedido() );
-                holder.nombreCliente.setText( insumos.get( pos ).getNombreCliente() );
+                holder.numPedido.setText( insumos.get( position ).getNumPedido() );
+                holder.nombreCliente.setText( insumos.get( position ).getNombreCliente() );
 
                 holder.itemClickListener( new ItemClickListener() {
                     @Override
-                    public void onItemClick(View v, int numPoss) {
-                        final String npedido = insumos.get( numPoss ).numPedido.toString();
-                        final String nombrecliente=insumos.get(numPoss).nombreCliente.toString();
+                    public void onItemClick(int numPoss) {
+                        final String npedido = insumos.get( numPoss ).numPedido;
+                        final String nombrecliente= insumos.get(numPoss).nombreCliente;
                         Toast.makeText( ctx, "Pedido Nº: "+npedido, Toast.LENGTH_SHORT ).show();
                         ctx.startActivity( new Intent( ctx, InsumosSubItem.class ).putExtra( "npedido",npedido ).putExtra( "nomcliente",nombrecliente ) );
                     }
                 } );
             }else if(List==2)
             {
-                holder.numSerie.setText( insumos.get( pos ).getNumSerie() );
-                holder.modelo.setText( insumos.get( pos ).getModelo());
+                holder.numSerie.setText( insumos.get( position ).getNumSerie() );
+                holder.modelo.setText( insumos.get( position ).getModelo());
                 holder.itemClickListener( new ItemClickListener() {
                     @Override
-                    public void onItemClick(View v, int numPoss) {
-                        final String modelo = insumos.get( numPoss ).modelo.toString();
-                        final String numSerie=insumos.get(numPoss).numSerie.toString();
+                    public void onItemClick(int numPoss) {
+                        final String modelo = insumos.get( numPoss ).modelo;
+                        final String numSerie= insumos.get(numPoss).numSerie;
                         Toast.makeText( ctx, "Pedido Nº: "+numSerie+modelo, Toast.LENGTH_SHORT ).show();
                         ctx.startActivity( new Intent( ctx, CamActivity.class ).putExtra( "modelo",modelo ).putExtra( "numSerie",numSerie ) );
                     }
@@ -105,11 +101,11 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
             }else if(List==3)
             {
 
-                holder.oneDate.setText( insumos.get(pos).getOneDate() );
+                holder.oneDate.setText( insumos.get( position ).getOneDate() );
                 holder.itemClickListener( new ItemClickListener() {
                     @Override
-                    public void onItemClick(View v, int numPoss) {
-                        String nameTec= insumos.get( numPoss ).oneDate.toString();
+                    public void onItemClick(int numPoss) {
+                        String nameTec= insumos.get( numPoss ).oneDate;
                         Toast.makeText( ctx, nameTec, Toast.LENGTH_SHORT ).show();
                         cbc.setTecSa(nameTec );
                         ctx.startActivity( new Intent( ctx,TecnicosActivity.class ).putExtra( "idTec",idTec( nameTec )) );
@@ -124,12 +120,12 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
                 } );*/
             }else if(List==4)
             {
-                holder.numPedido.setText( insumos.get( pos ).getNumPedido() );
-                holder.nombreCliente.setText( insumos.get( pos ).getNombreCliente() );
-                holder.categoria.setText(insumos.get(pos).getCategoria());
-                holder.horaVence.setText(insumos.get( pos ).getHoraVence());
+                holder.numPedido.setText( insumos.get( position ).getNumPedido() );
+                holder.nombreCliente.setText( insumos.get( position ).getNombreCliente() );
+                holder.categoria.setText(insumos.get( position ).getCategoria());
+                holder.horaVence.setText(insumos.get( position ).getHoraVence());
 
-                final String npedido = insumos.get( pos ).getNumPedido();
+                final String npedido = insumos.get( position ).getNumPedido();
                 SQLiteDatabase db = con.getReadableDatabase();
                 String SQL="SELECT Ingreso FROM "+ dbTecnicos.TABLE+ " WHERE nParte='"+npedido+"'";
                 Cursor resp=db.rawQuery( SQL,null);
@@ -139,16 +135,11 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
                 }
                 db.close();
 
-
-
-
-
-
                 holder.itemClickListener( new ItemClickListener() {
                     @Override
-                    public void onItemClick(View v, int numPoss) {
-                        final String npedido = insumos.get( numPoss ).numPedido.toString();
-                        final String nombrecliente=insumos.get(numPoss).nombreCliente.toString();
+                    public void onItemClick(int numPoss) {
+                        final String npedido = insumos.get( numPoss ).numPedido;
+                        final String nombrecliente= insumos.get(numPoss).nombreCliente;
                         Toast.makeText( ctx, "Pedido Nº: "+npedido, Toast.LENGTH_SHORT ).show();
                         /***/
                         SQLiteDatabase db = con.getReadableDatabase();
@@ -204,4 +195,6 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
         db.close();
         return  idTec;
     }
+
+
 }

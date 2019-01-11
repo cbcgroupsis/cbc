@@ -56,10 +56,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         linearLayout.setOnClickListener( this );
         cbc= new CBC(LoginActivity.this);
         if(cbc.getSession())HomeStart();                                                            //Verifico si la sesion esta guardad.Si es asi, directamente voy a la pantalla principal (home)
-
-
-
-
     }
 
     @Override
@@ -85,7 +81,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         cbc.progressDialog( "Logeando...","Espere por favor..." );                   //Dialogo en pantalla indicando al usuario que se esta autentificando la informacion ingresada.
         RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);             //Creo una nueva cola de solicitud.
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, CfgCbc.ULRLOGIN,                  //Creo una String de solicitud, en el cual cargo la URL y El metodo Post.
+        String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Login/authentication";
+        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,                  //Creo una String de solicitud, en el cual cargo la URL y El metodo Post.
                 new Response.Listener<String>()
                 {
                     @Override
@@ -97,7 +94,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             JSONObject response = new JSONObject(s);                                 //Convierto el String en un Objeto.
                             JSONArray res=response.getJSONArray( "Login" );                   //Busco en el objeto el key "Login" y convierto todos los objetos hijos en un arreglo.
                             JSONObject obj = res.getJSONObject(0);                            //Obtengo los valores de la posicion 0 del arreglo.
-                            if(obj.getString( "acceso" ).equals( "true" ))                    //Busco en la posicion 0 el valor del objeto "acceso". Si el valor es "true" significa que la autentificacion fue correcta.
+                            if(obj.getBoolean( "access" ))                    //Busco en la posicion 0 el valor del objeto "acceso". Si el valor es "true" significa que la autentificacion fue correcta.
                             {
                                 if(sesion.isChecked()) cbc.setSession( true );                      //Verifico si el usuario quiere guardar la sesion, si es asi guardo la sesion.
                                 else cbc.setSession( false );                                       //caso contrario, indico que el usuario no quiere guardar la sesion.
@@ -129,8 +126,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             protected Map<String, String> getParams()
             {
                 Map<String, String> params = new Hashtable<>();                                     //Parametros a enviar.
-                params.put("user_name",userName.getText().toString());                              //nombre del usuario
-                params.put("user_password",userPassword.getText().toString());                      //contraseña.
+                params.put("userName",userName.getText().toString());                              //nombre del usuario
+                params.put("userPassword",userPassword.getText().toString());                      //contraseña.
              //   params.put("token",token);                                                          //Envio el identificador unico del celular.
                 return params;                                                                      //Envio los parametros por el metodo post.
             }

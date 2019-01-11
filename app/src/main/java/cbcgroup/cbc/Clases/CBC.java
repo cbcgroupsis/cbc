@@ -7,25 +7,26 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class CBC
 {
-    Context ctx;
-    ProgressDialog loading;
+    /**
+     * asdasd
+     */
+    private final Context ctx;
+    private ProgressDialog loading;
     /**/
-    SharedPreferences getstorage,insumos;
-    SharedPreferences.Editor storage,insumosEdit;
-    private String neuText="";
+    private final SharedPreferences getstorage;
+    private final SharedPreferences insumos;
+    private SharedPreferences.Editor storage;
     /**/
     public CBC(Context ctx)
     {
         this.ctx=ctx;
         getstorage=ctx.getSharedPreferences( "userInfo",Context.MODE_PRIVATE );
-        storage=getstorage.edit();
         insumos=ctx.getSharedPreferences( "insumos",Context.MODE_PRIVATE );
-        insumosEdit=insumos.edit();
+
     }
     public void msg(String msg){Toast.makeText( ctx, msg, Toast.LENGTH_LONG ).show();}
     public void debug(String TAG,String msg){Log.w(TAG,msg);}
@@ -39,8 +40,7 @@ public class CBC
         {
             Process p = java.lang.Runtime.getRuntime().exec("ping -c 1 correo.cbcgroup.com.ar");
             int val           = p.waitFor();
-            boolean reachable = (val == 0);
-            return reachable;
+            return (val == 0);
         } catch (Exception e){e.printStackTrace();}
         return false;
     }
@@ -49,97 +49,71 @@ public class CBC
     ///////////////////////////////////////////////////////////////////////////////////////////////
     public String spaceRemplace(String dato,String remplace)
     {
-        String aux="";
+        StringBuilder aux= new StringBuilder();
         char[] strAux=dato.toCharArray();
         for(int a=0;a<dato.length();a++)
         {
             if(strAux[a]==' ')
             {
-                aux+=remplace;
-            }else aux+=Character.toString( strAux[a] );
+                aux.append( remplace );
+            }else aux.append( Character.toString( strAux[a] ) );
         }
-        return aux;
-    }
-    public String spaceEncoode(String dato)
-    {
-        String aux="";
-        char[] strAux=dato.toCharArray();
-        for(int a=0;a<dato.length();a++)
-        {
-            if(strAux[a]==' ')
-            {
-                aux+="%20";
-            }else aux+=Character.toString( strAux[a] );
-        }
-        return aux;
-    }
-    /**********************************************************************************************/
-    public String ReadStorage(String filename )
-    {
-        try {
-            String FILE_NAME = filename+".txt";
-            FileInputStream fin = ctx.openFileInput(FILE_NAME);
-            int size;
-            while ((size = fin.read()) != -1) {neuText += Character.toString((char) size); }
-        } catch (Exception error) {}
-        return  neuText;
+        return aux.toString();
     }
 
-    public void SaveStorage(String filename,String response)
+    private void SaveStorage(String response)
     {
         try {
 
-            File f = new File(filename+".TXT");
+            File f = new File( insumos +".TXT");
             f.delete();
-            String FILE_NAME = filename+".txt";
-            String content = response;
-
-
+            String FILE_NAME = insumos +".txt";
             FileOutputStream fos = ctx.openFileOutput(FILE_NAME,Context.MODE_PRIVATE);
-            fos.write(content.getBytes());
+            fos.write( response.getBytes());
             fos.close();
-        } catch (Exception error) {}
+        } catch (Exception ignored) {}
     }
     /***********************************************************************************************/
-    public void contInsumos(int cont)
-    {
-        insumosEdit.putInt( "contInsumos",cont );
-        insumosEdit.commit();
-    }
 
     public void setInsumos(String response)
     {
-        SaveStorage( "insumos",response );
+        SaveStorage( response );
     }
     public void setUserName(String name)
     {
+        storage=getstorage.edit();
         storage.putString( "userName",name );
-        storage.commit();
+        storage.apply();
     }
     public void setUserId(String name)
     {
+        storage=getstorage.edit();
         storage.putString( "userId",name );
-        storage.commit();
+        storage.apply();
     }
     public void setUserPassword(String name)
     {
+        storage=getstorage.edit();
         storage.putString( "userPassword",name );
-        storage.commit();
+        storage.apply();
     }
     public void setUserSector(String sector)
     {
+        storage=getstorage.edit();
         storage.putString( "userSector",sector );
-        storage.commit();
+        storage.apply();
     }
     public void setTecSa(String sector)
     {
+        storage=getstorage.edit();
         storage.putString( "tecSa",sector );
-        storage.commit();
+        storage.apply();
     }
     public void setUserEmail(String email)
     {
+        storage=getstorage.edit();
         storage.putString( "userEmail",email );
-        storage.commit();
+        storage.apply();
     }
     public String getTecSa()
     {
@@ -147,33 +121,27 @@ public class CBC
     }
     public void setIngresoTecnico(Boolean ingreso)
     {
+        storage=getstorage.edit();
         storage.putBoolean( "tecIngreso",ingreso);
-        storage.commit();
+        storage.apply();
     }
     public void setIngresonpedido(String ingreso)
     {
+        storage=getstorage.edit();
         storage.putString ("ingresoNpedido",ingreso);
-        storage.commit();
+        storage.apply();
     }
     public void setSession(boolean bool)
     {
+        storage=getstorage.edit();
         storage.putBoolean ("Session",bool);
-        storage.commit();
+        storage.apply();
     }
     public Boolean getSession()
     {
         return getstorage.getBoolean( "Session",false );
     }
 
-    public String getIngresoNpedido()
-    {
-        return getstorage.getString( "ingresoNpedido","" );
-    }
-
-    public Boolean getIngresoTecnico()
-    {
-        return getstorage.getBoolean( "tecIngreso",false );
-    }
     public String getdUserName()
     {
         return getstorage.getString( "userName","" );
@@ -194,26 +162,20 @@ public class CBC
     {
         return getstorage.getString( "userEmail","" );
     }
-    public String getdInsumos()
-    {
-        return ReadStorage( "insumos" );
-    }
-    public int getdContInsumos()
-    {
-        return insumos.getInt( "contInsumos",0 );
-    }
 
 
 
     public void setInsumosNpedidos(String npedidos)
     {
+        storage=getstorage.edit();
         storage.putString( "npedidos",npedidos );
-        storage.commit();
+        storage.apply();
     }
     public void setInsumosClientes(String npedidos)
     {
+        storage=getstorage.edit();
         storage.putString( "clientes",npedidos );
-        storage.commit();
+        storage.apply();
     }
     public String getInsumosNpedidos()
     {

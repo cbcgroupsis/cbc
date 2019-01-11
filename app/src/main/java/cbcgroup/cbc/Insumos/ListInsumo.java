@@ -7,9 +7,9 @@ public class ListInsumo
     String numSerie;
     String modelo;
     String oneDate;
-    String idTec;
-    String categoria;
-    String horaVence;
+    private String idTec;
+    private String categoria;
+    private String horaVence;
 
     public String getHoraVence() {
         return horaVence;

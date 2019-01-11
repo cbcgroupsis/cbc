@@ -2,14 +2,11 @@ package cbcgroup.cbc.Activity;
 
 import android.app.AlertDialog;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -28,24 +25,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Map;
 
 import cbcgroup.cbc.Clases.CBC;
-import cbcgroup.cbc.Insumos.AdapterInsumos;
-import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
-import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecnicos;
 
 public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
@@ -53,16 +39,20 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
     private static final String TAG = "TecnicosInActivity";
     private static final String CHANNEL_ID = "test";
     private int NOTIFICATION_ID =0 ;
-    String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/hoja_de_reparacion.php?";
-    String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
-    TextView serie,sector,fecha,modelo,inconveniente,fechaVencimiento;
-    Button button;
+    //String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/hoja_de_reparacion.php?";
+    String URL = "tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/servicio/in";
+    private TextView serie;
+    private TextView sector;
+    private TextView fecha;
+    private TextView modelo;
+    private TextView inconveniente;
+    private TextView fechaVencimiento;
+    private Button button;
     String nombre;
-    Bundle extra;
-    CBC cbc;
-    NotificationCompat.Builder builder;
+    private Bundle extra;
+    private CBC cbc;
+    NotificationCompat.Builder builderr;
 
-    private SQLite sql;
     private ConnSQLiteHelper con;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -80,8 +70,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         button.setOnClickListener( this );
         cbc= new CBC(TecnicoIn.this);
         con =  new ConnSQLiteHelper( this);
-        sql = new SQLite();
-        builder = new NotificationCompat.Builder(this);
+        SQLite sql = new SQLite();
         extra=getIntent().getExtras();
         CompleteInfo();
     }
@@ -100,7 +89,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         }
     }
 
-    void IngresoPedido()
+    private void IngresoPedido()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,AlertDialog.THEME_HOLO_DARK);
         alertDialogBuilder.setMessage("Desea Ingresar al pedido tecnico?");
@@ -128,10 +117,12 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         alertDialog.show();
     }
 
-    void ingresoQuery()
+    private void ingresoQuery()
     {
         RequestQueue requestQueue = Volley.newRequestQueue(TecnicoIn.this);
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL2,
+        //String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
+        String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/servicio/in";
+        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                 new Response.Listener<String>()
                 {
                     @Override
@@ -158,11 +149,10 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
             protected Map<String, String> getParams()
             {
                 Map<String, String> params = new Hashtable<>();
-                params.put("Content-Type","application/json; charset=utf-8");
-                params.put("llegada","true");
-                params.put("id_tecnico",cbc.getdUserId() );
+                params.put("llegada","1");
+                params.put("idTec",cbc.getdUserId() );
                 params.put("serie",serie.getText().toString());
-                params.put("id_parte", extra.getString( "npedido" ));
+                params.put("nparte", extra.getString( "npedido" ));
                 return params;
             }
 
@@ -170,7 +160,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         requestQueue.add(stringRequest);
     }
 
-    void CompleteInfo()
+    private void CompleteInfo()
     {
         String nparte= extra.getString( "npedido" );
         SQLiteDatabase db = con.getReadableDatabase();
@@ -250,6 +240,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
     {
         SQLiteDatabase db = con.getReadableDatabase();
         String SQL="SELECT nParte,Cliente FROM Tecnicos WHERE Ingreso='1';";
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext(), "M_CH_ID");
         try
         {
             Cursor resp=db.rawQuery( SQL,null );

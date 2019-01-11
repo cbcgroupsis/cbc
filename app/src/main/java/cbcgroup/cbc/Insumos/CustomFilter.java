@@ -4,11 +4,11 @@ import android.widget.Filter;
 
 import java.util.ArrayList;
 
-public class CustomFilter extends Filter
+class CustomFilter extends Filter
 {
-    AdapterInsumos adapter;
-    ArrayList<ListInsumo> filterList;
-    private int list;
+    private final AdapterInsumos adapter;
+    private final ArrayList<ListInsumo> filterList;
+    private final int list;
     public CustomFilter(ArrayList<ListInsumo> filterList, AdapterInsumos adapterInsumos,int list)
     {
         this.filterList = filterList;

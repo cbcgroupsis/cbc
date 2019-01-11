@@ -17,7 +17,6 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.system.ErrnoException;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Base64;
 import android.util.Log;
@@ -39,19 +38,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
-import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecnicos;
 
@@ -62,24 +57,19 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
 {
     private static final String TAG = "TecnicosOutActivity";
     private String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/hoja_de_reparacion.php?";
-    private String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
-    private String URLIMAGEN = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
     private TextView serie,sector,fecha,modelo,fechaVencimiento;
     private EditText tareaRealizada,copias,copiasColor,viajeHora,viajeMinutos;
     private ImageButton imgTec;
     private Button button;
-    private String nombre;
+    private String bmpUri;
     private Bundle extra;
     private CBC cbc;
     private LinearLayout  linearLayout;
 
-    //////////////////Sacar fotos /////////////////
-    private ContentValues values;
     private Uri imageUri;
     private static final int PICTURE_RESULT = 122;
     ///////////////// CAM RESULT /////////////////
     private Bitmap thumbnail;
-    private String imageurl;
     private ConnSQLiteHelper con;
     private SQLite sql;
     /////////////////////////////////////////////
@@ -244,7 +234,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         requestQueue.add(stringRequest);
     }
 */
-    void CerrarPedido()
+  private void CerrarPedido()
     {
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,AlertDialog.THEME_HOLO_DARK);
@@ -258,8 +248,10 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
             {
                 if(cbc.Internet()) regresoQuery();
                else  GuardarInformacion();
-
                Salida();
+               if(thumbnail!=null)getContentResolver().delete( imageUri, null, null );
+
+
 
             }
         });
@@ -276,10 +268,12 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    void regresoQuery()
+    private void regresoQuery()
     {
         RequestQueue requestQueue = Volley.newRequestQueue(TecnicosOut.this);
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL2,
+        //String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
+        String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/servicio/out";
+        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                 new Response.Listener<String>()
                 {
                     @Override
@@ -336,7 +330,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     }
 
     /******************************* FOTO *************************************/
-    boolean Permisos()
+    private boolean Permisos()
     {
         if (ActivityCompat.checkSelfPermission( TecnicosOut.this, CAMERA ) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission( TecnicosOut.this, WRITE_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -346,9 +340,10 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
             return false;
         }else return true;
     }
-    void SacarFoto()
+    private void SacarFoto()
     {
-        values = new ContentValues();
+        //////////////////Sacar fotos /////////////////
+        ContentValues values = new ContentValues();
         values.put( MediaStore.Images.Media.TITLE, "cbc" );
         values.put( MediaStore.Images.Media.DESCRIPTION, System.currentTimeMillis() );
         imageUri = getContentResolver().insert(
@@ -359,7 +354,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    void SubirImagen()
+    private void SubirImagen()
     {
 
 
@@ -384,7 +379,9 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                             thumbnail = MediaStore.Images.Media.getBitmap( getContentResolver(), imageUri );
                             imgTec.setImageBitmap(thumbnail );
                             //Obtiene la ruta donde se encuentra guardada la imagen.
-                            imageurl = getRealPathFromURI( imageUri );
+                            bmpUri = getRealPathFromURI( imageUri );
+                            Log.w("imgTecnicos","imgUri->"+imageUri);
+
                         } catch (Exception e)
                         {
                             e.printStackTrace();
@@ -395,15 +392,21 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    public String getRealPathFromURI(Uri contentUri) {
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = managedQuery( contentUri, proj, null, null, null );
-        int column_index = cursor.getColumnIndexOrThrow( MediaStore.Images.Media.DATA );
-        cursor.moveToFirst();
-        return cursor.getString( column_index );
+    private String getRealPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor != null && Objects.requireNonNull( cursor ).moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow( MediaStore.Images.Media.DATA );
+            res = cursor.getString( column_index );
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return res;
     }
     /***********************************************************************************************/
-    public String getStringImagen(Bitmap bmp)
+    private String getStringImagen(Bitmap bmp)
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -426,6 +429,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
             }
         } );
         loading.show();
+        String URLIMAGEN = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
         StringRequest stringRequest = new StringRequest( Request.Method.POST, URLIMAGEN,
                 new Response.Listener<String>()
                 {
@@ -443,9 +447,6 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                     public void onErrorResponse(VolleyError volleyError)
                     {
                         loading.dismiss();
-                     //   Toast.makeText(TecnicosOut.this, "Error: No se pudo subir la imagen", Toast.LENGTH_LONG).show();
-                        //Toast.makeText( Cam.this,volleyError.toString(),Toast.LENGTH_LONG ).show();
-
                     }
                 })
         {
@@ -455,7 +456,6 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
 
                 foto = Bitmap.createScaledBitmap(thumbnail, 500, 500, true);
                 String imagen = getStringImagen( foto);
-
                 Map<String, String> params = new Hashtable<>();
                 params.put("foto", imagen);
                 params.put("nparte",extra.getString( "npedido" ));
@@ -537,7 +537,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         startActivity( new Intent(TecnicosOut.this,HomeActivity.class ).putExtra( "homeStart","homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ));
     }
 
-    void CompleteInfo()
+    private void CompleteInfo()
     {
         String nparte= extra.getString( "npedido" );
         Intent intent=getIntent();

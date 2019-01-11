@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.provider.SyncStateContract;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,9 +19,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Hashtable;
 import java.util.Map;
 
+import cbcgroup.cbc.Activity.CamActivity;
+import cbcgroup.cbc.Activity.HomeActivity;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.Tablas.dbInsumosSinInternet;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
@@ -32,10 +37,9 @@ public class NetworkSchedulerService extends JobService implements
 
     private static final String TAG = "TESTINTERNET";
     private static final String URLIMAGEN = "https://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
-    private static final String URL = "https://tecnicos.cbcgroup.com.ar/Test/app_android/imagen.php";
+    private static final String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/produccion/api/android.php/Insumos/uploadImg";
     private Context context;
     private ConnSQLiteHelper con;
-    private CBC cbc;
     private ConnectivityReceiver mConnectivityReceiver;
 
     @Override
@@ -44,7 +48,7 @@ public class NetworkSchedulerService extends JobService implements
         Log.i(TAG, "Service created");
         this.context = this;
         con =  new ConnSQLiteHelper(context);
-        cbc = new CBC(context);
+        CBC cbc = new CBC( context );
         mConnectivityReceiver = new ConnectivityReceiver(this);
     }
 
@@ -90,7 +94,7 @@ public class NetworkSchedulerService extends JobService implements
 
     }
 
-    Map<String,String> Mostrar()
+    private Map<String,String> Mostrar()
     {
         SQLiteDatabase db = con.getWritableDatabase();
         Map<String, String> params = new Hashtable<>();
@@ -177,7 +181,7 @@ public class NetworkSchedulerService extends JobService implements
     }
 
     /******************************************************/
-    Map<String,String> Mostrar2()
+    private Map<String,String> Mostrar2()
     {
         SQLiteDatabase db = con.getWritableDatabase();
         Map<String, String> params = new Hashtable<>();
@@ -186,10 +190,10 @@ public class NetworkSchedulerService extends JobService implements
         if(resp==null) return null;
         if(resp.moveToPosition( 0 ))
         {
-            params.put("name", resp.getString( 0 ));
+            params.put("nameTec", resp.getString( 0 ));
             params.put("serie",resp.getString( 1 ));
-            params.put("foto", resp.getString( 2 ));
-            params.put("nombre", resp.getString( 3 ));
+            params.put("img", resp.getString( 2 ));
+            params.put("npedido", resp.getString( 3 ));
 
         }
 
@@ -204,39 +208,52 @@ public class NetworkSchedulerService extends JobService implements
             String SQL = "SELECT Nombre,Serie,Foto FROM " + dbInsumosSinInternet.TABLE;
             resp = db.rawQuery( SQL, null );
             resp.moveToPosition( 0 );
-            db.close();
         }
         if (resp.getCount() != 0)
         {
             StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                     new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String s) {
-                            SQLiteDatabase db = con.getWritableDatabase();
-                            String idParte = "";
-                            String SQL="SELECT Nombre,nPedido,Serie,Foto FROM "+ dbInsumosSinInternet.TABLE;
-                            Cursor resp = db.rawQuery( SQL, null );
-                            if (resp.moveToPosition( 0 )) {
+                        public void onResponse(String s)
+                        {
 
-                                idParte = resp.getString( 1 );
-                            }
+                            try {
+                                Log.w("RESPUESTACAM","resp:"+s);
+                                JSONObject response = new JSONObject(s);
+                                JSONArray res=response.getJSONArray( "resp" );
+                                JSONObject obj= res.getJSONObject( 0 );
+                                if(obj.getBoolean( "status" ))
+                                {
+                                    Log.w(TAG,"resp true");
+                                    SQLiteDatabase db = con.getWritableDatabase();
+                                    String idParte = "";
+                                    String SQL="SELECT Nombre,nPedido,Serie,Foto FROM "+ dbInsumosSinInternet.TABLE;
+                                    Cursor resp = db.rawQuery( SQL, null );
+                                    if (resp.moveToPosition( 0 )) {
 
-                            db.close();
-                            if (resp.getCount() != 0) {
-                                db = con.getWritableDatabase();
-                                SQL = "DELETE FROM " + dbInsumosSinInternet.TABLE + " WHERE nPedido='" + idParte + "';";
-                                try {
-                                    db.execSQL( SQL );
-                                    Log.w( TAG, "FILA BORRADA" );
-                                    uploadImage2();
+                                        idParte = resp.getString( 1 );
+                                    }
                                     db.close();
+                                    if (resp.getCount() != 0) {
+                                        db = con.getWritableDatabase();
+                                        SQL = "DELETE FROM " + dbInsumosSinInternet.TABLE + " WHERE nPedido='" + idParte + "';";
+                                        try {
+                                            db.execSQL( SQL );
+                                            Log.w( TAG, "FILA BORRADA" );
+                                            uploadImage2();
+                                            db.close();
 
 
-                                } catch (Exception e) {
-                                    Log.w( TAG, e.toString() );
-                                }
-                                db.close();
+                                        } catch (Exception e) {
+                                            Log.w( TAG, e.toString() );
+                                        }
+                                        db.close();
+                                    }
+                                }else Log.w(TAG,"rep-false");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+
                         }
                     },
                     new Response.ErrorListener() {

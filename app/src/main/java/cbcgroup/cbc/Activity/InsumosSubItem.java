@@ -37,14 +37,12 @@ import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 public class InsumosSubItem extends AppCompatActivity {
 
     private static final String TAG = "INSUMOS-SUB-ITEM" ;
-    private String URL = "http://tecnicos.cbcgroup.com.ar:80/Test/app_android/v14/insumosSubItem.php";
     private android.support.v7.widget.SearchView searchView;
     private RecyclerView recyclerView;
-    ListInsumo insumos = new ListInsumo();
-    AdapterInsumos adapter;
-    CBC cbc;
+    private ListInsumo insumos = new ListInsumo();
+    private AdapterInsumos adapter;
+    private CBC cbc;
 
-    private SQLite sql;
     private ConnSQLiteHelper con;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +52,13 @@ public class InsumosSubItem extends AppCompatActivity {
         recyclerView=findViewById( R.id.myRecycler );
         recyclerView.setLayoutManager( new LinearLayoutManager( InsumosSubItem.this ) );
         recyclerView.setItemAnimator( new DefaultItemAnimator() );
-        Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
+        Toolbar toolbar = findViewById( R.id.toolbar );
         cbc=new CBC(InsumosSubItem.this);
         setSupportActionBar( toolbar );
         Bundle extra=getIntent().getExtras();
 
         con =  new ConnSQLiteHelper( this);
-        sql = new SQLite();
+        SQLite sql = new SQLite();
         if(extra!=null)
         {
             getSupportActionBar().setTitle("Insumos - Npedido: "+extra.getString( "npedido"));
@@ -79,7 +77,7 @@ public class InsumosSubItem extends AppCompatActivity {
 
     }
 
-    void List(String  res)
+    private void List(String res)
     {
 
         final ArrayList<ListInsumo> list=new ArrayList<>();
@@ -103,7 +101,7 @@ public class InsumosSubItem extends AppCompatActivity {
         }
     }
 
-    void Search()
+    private void Search()
     {
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
@@ -120,10 +118,11 @@ public class InsumosSubItem extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    void Programa()
+    private void Programa()
     {
         cbc.progressDialog( "Cargando Pedidos...","Espere por favor..." );
         RequestQueue requestQueue = Volley.newRequestQueue(InsumosSubItem.this);
+        String URL = "http://tecnicos.cbcgroup.com.ar:80/Test/app_android/v14/insumosSubItem.php";
         StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                 new Response.Listener<String>()
                 {

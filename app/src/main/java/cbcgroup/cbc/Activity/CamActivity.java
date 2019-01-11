@@ -33,16 +33,20 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
 import cbcgroup.cbc.dbLocal.Tablas.dbInsumosSinInternet;
-import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -52,16 +56,12 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
     private TextView txvModelo,txvSerie,txvCliente;
     private ImageButton imgInsumos;
     private Button btnEnviar;
-    private String TAG ="CAM";
+    private final String TAG ="CamActivity";
     private CBC cbc;
-    String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/imagen.php";
-    //////////////////Sacar fotos /////////////////
-    private ContentValues values;
     private Uri imageUri;
     private static final int PICTURE_RESULT = 122;
     ///////////////// CAM RESULT /////////////////
     private Bitmap thumbnail;
-    private String imageurl;
     /////////////////////////////////////////////
     String nombre,serie;
     private SQLite sql;
@@ -106,7 +106,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
             if(Permisos()) SacarFoto();
         }
     }
-    void CargarInfo()
+    private void CargarInfo()
     {
         Bundle extra= getIntent().getExtras();
         if(extra!=null)
@@ -119,7 +119,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
 
     }
 
-    boolean Permisos()
+    private boolean Permisos()
     {
         if (ActivityCompat.checkSelfPermission( CamActivity.this, CAMERA ) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission( CamActivity.this, WRITE_EXTERNAL_STORAGE ) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -129,9 +129,10 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
            return false;
         }else return true;
     }
-    void SacarFoto()
+    private void SacarFoto()
     {
-        values = new ContentValues();
+        //////////////////Sacar fotos /////////////////
+        ContentValues values = new ContentValues();
         values.put( MediaStore.Images.Media.TITLE, "cbc" );
         values.put( MediaStore.Images.Media.DESCRIPTION, System.currentTimeMillis() );
         imageUri = getContentResolver().insert(
@@ -140,7 +141,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         intent.putExtra( MediaStore.EXTRA_OUTPUT, imageUri );
         startActivityForResult( intent, PICTURE_RESULT );
     }
-    void SubirImagen()
+    private void SubirImagen()
     {
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,AlertDialog.THEME_HOLO_DARK);
@@ -184,7 +185,7 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
                             thumbnail = MediaStore.Images.Media.getBitmap( getContentResolver(), imageUri );
                             imgInsumos.setImageBitmap(thumbnail );
                             //Obtiene la ruta donde se encuentra guardada la imagen.
-                            imageurl = getRealPathFromURI( imageUri );
+                            String imageurl = getRealPathFromURI( imageUri );
                         } catch (Exception e)
                         {
                             e.printStackTrace();
@@ -224,15 +225,21 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    public String getRealPathFromURI(Uri contentUri) {
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = managedQuery( contentUri, proj, null, null, null );
-        int column_index = cursor.getColumnIndexOrThrow( MediaStore.Images.Media.DATA );
-        cursor.moveToFirst();
-        return cursor.getString( column_index );
+    private String getRealPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor != null && Objects.requireNonNull( cursor ).moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow( MediaStore.Images.Media.DATA );
+            res = cursor.getString( column_index );
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        return res;
     }
     /***********************************************************************************************/
-    public String getStringImagen(Bitmap bmp)
+    private String getStringImagen(Bitmap bmp)
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -255,15 +262,35 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
             }
         } );
         loading.show();
+        String URL="http://tecnicos.cbcgroup.com.ar/Test/app_android/produccion/api/android.php/Insumos/uploadImg";
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                 new Response.Listener<String>()
                 {
                     @Override
                     public void onResponse(String s)
                     {
+                        Log.w(TAG,"resp:"+s);
                         loading.dismiss();
-                        Toast.makeText(CamActivity.this, "Imagen Subida", Toast.LENGTH_LONG).show();
-                        startActivity( new Intent(CamActivity.this,HomeActivity.class ).putExtra( "homeStart","homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ));
+                        try {
+                            Log.w("RESPUESTACAM","resp:"+s);
+                            JSONObject response = new JSONObject(s);
+                            JSONArray res=response.getJSONArray( "resp" );
+                            JSONObject obj= res.getJSONObject( 0 );
+                            if(obj.getBoolean( "status" )) {
+                                Toast.makeText( CamActivity.this, "Imagen Subida", Toast.LENGTH_LONG ).show();
+                                if (thumbnail != null)
+                                    getContentResolver().delete( imageUri, null, null );
+                                startActivity( new Intent( CamActivity.this, HomeActivity.class ).putExtra( "homeStart", "homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ) );
+                            }else
+                                {
+                                    GuardarInformacion();
+                                }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
                     }
                 },
                 new Response.ErrorListener()
@@ -272,9 +299,6 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
                     public void onErrorResponse(VolleyError volleyError)
                     {
                         loading.dismiss();
-                        //Toast.makeText(CamActivity.this, "Error: No se pudo subir la imagen", Toast.LENGTH_LONG).show();
-
-                        //Toast.makeText( Cam.this,volleyError.toString(),Toast.LENGTH_LONG ).show();
                         GuardarInformacion();
 
                     }
@@ -289,10 +313,10 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
 
                 Map<String, String> params = new Hashtable<>();
                 Bundle extra= getIntent().getExtras();
-                params.put("foto", imagen);
+                params.put("img", imagen);
                 params.put("serie",extra.getString( "numSerie" ));
-                params.put("name", cbc.getdUserName());
-                params.put("nombre",cbc.getInsumosNpedidos() ); //npedido
+                params.put("nameTec", cbc.getdUserName());
+                params.put("npedido",cbc.getInsumosNpedidos() ); //npedido
                 return params;
             }
         };
@@ -300,7 +324,6 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
     }
 

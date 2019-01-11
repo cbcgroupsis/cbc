@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -31,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
-import cbcgroup.cbc.Activity.TecnicosOut;
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.Insumos.AdapterInsumos;
 import cbcgroup.cbc.Insumos.ListInsumo;
@@ -40,16 +38,15 @@ import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
 import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class InsumosFragment extends Fragment
 {
     private OnFragmentInteractionListener mListener;
-    public static final String TAG = "TecnicosSuperAdmin_Fragment";
-    private String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/v14/prueba/insumosPrueba.php";
+    private static final String TAG = "TecnicosSuperAdmin_Fragment";
     private android.support.v7.widget.SearchView searchView;
     private RecyclerView recyclerView;
-    ListInsumo insumos = new ListInsumo();
-    AdapterInsumos adapter;
-    CBC cbc;
+    private AdapterInsumos adapter;
+    private CBC cbc;
     /**db*/
    private SQLite sql;
    private ConnSQLiteHelper con;
@@ -97,13 +94,11 @@ public class InsumosFragment extends Fragment
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction();
     }
-    void List(String  res)
+    private void List(String res)
     {
 
-        final ArrayList<ListInsumo> list=new ArrayList<>();
-        list.clear();
         Log.w("INSUMOS","LIST_RESPONSE"+res);
         try {
             JSONObject response = new JSONObject( res );
@@ -114,7 +109,7 @@ public class InsumosFragment extends Fragment
             //    insumos=new ListInsumo();
             //    insumos.setNumPedido(obj.getString( "npedido" ));
            //     insumos.setNombreCliente(obj.getString( "cliente" ));
-                SincronizarDbLocal(obj.getString( "npedido" ),obj.getString( "cliente" ),obj.getString( "serie"),obj.getString( "modelo" ) );
+                SincronizarDbLocal(obj.getString( "num" ),obj.getString( "clte" ),obj.getString( "ns"),obj.getString( "mod" ) );
              //   list.add(insumos);
             }
           ProgramaSinConexion();
@@ -129,7 +124,7 @@ public class InsumosFragment extends Fragment
     }
 
 
-    void Search()
+    private void Search()
     {
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
@@ -146,11 +141,12 @@ public class InsumosFragment extends Fragment
         recyclerView.setAdapter(adapter);
     }
 
-    void Programa()
+    private void Programa()
     {
         cbc.progressDialog( "Cargando Pedidos de Insumos...","Espere por favor." );
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
+        String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/produccion/api/android.php/Insumos/all";
+        StringRequest stringRequest = new StringRequest( Request.Method.GET, URL,
                 new Response.Listener<String>()
                 {
                     @SuppressLint("LongLogTag")
@@ -196,7 +192,7 @@ public class InsumosFragment extends Fragment
     private void SincronizarDbLocal(String nPedido,String cliente,String serie,String modelo)
     {
         SQLiteDatabase db=con.getWritableDatabase();
-        Map params = new Hashtable(  );
+        Map<String, String> params = new Hashtable<String, String>(  );
         params.clear();
         params.put( dbInsumos.CAMPO_NPEDIDO,nPedido);
         params.put(dbInsumos.CAMPO_Cliente,cliente);
@@ -217,10 +213,10 @@ public class InsumosFragment extends Fragment
         {
             if(resp.moveToPosition( i ))
             {
-                insumos=new ListInsumo();
+                ListInsumo insumos = new ListInsumo();
                 insumos.setNumPedido(resp.getString(0));
                 insumos.setNombreCliente(resp.getString( 1 ));
-                list.add(insumos);
+                list.add( insumos );
             }
         }
         adapter=new AdapterInsumos(getActivity(),list,1);

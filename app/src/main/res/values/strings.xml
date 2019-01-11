@@ -21,7 +21,7 @@
     <string name="progressDialogTitulo">Logeando...</string>
     <string name="progressDialogMensaje">Espere por favor...</string>
     <!--**CONFIRM**-->
-    <string name="ConfirmUserPassword">btn Login-> btn:Ok</string>
+    <string name="ConfirmUserPassword">btn Login->OK</string>
     <!--**ERROR**-->
     <string name="ErrorUserPassword">Error: Complete todos los campos.</string>
     <!-- ************************************* HOME_ACTIVITY ***********************************-->
@@ -33,4 +33,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_tecnicos">TecnicosActivity</string>
+    <string name="imgInsumos">imgInsumos</string>
+    <string name="imgrefresh">imgRefresh</string>
+    <string name="imgcamtecnico">imgCamTecnico</string>
+    <string name="imghomelogo">imgHomeLogo</string>
+    <string name="imglist">imgList</string>
+    <string name="enviar">Enviar</string>
 </resources>
