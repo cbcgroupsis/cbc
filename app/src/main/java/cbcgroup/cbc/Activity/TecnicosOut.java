@@ -24,6 +24,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -61,6 +62,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     private EditText tareaRealizada,copias,copiasColor,viajeHora,viajeMinutos;
     private ImageButton imgTec;
     private Button button;
+    private CheckBox checboxCierre;
     private String bmpUri;
     private Bundle extra;
     private CBC cbc;
@@ -84,6 +86,7 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
         modelo.setMovementMethod(new ScrollingMovementMethod());
         serie=findViewById( R.id.tec_subItem_serie );
         sector=findViewById( R.id.tec_subItem_sector);
+        checboxCierre=findViewById( R.id.checkboxCierre );
         fecha=findViewById( R.id.tec_subItem_fecha);
         tareaRealizada=findViewById( R.id.tarea_realizada);
         copias=findViewById( R.id.contador );
@@ -271,8 +274,8 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
     private void regresoQuery()
     {
         RequestQueue requestQueue = Volley.newRequestQueue(TecnicosOut.this);
-        //String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
-        String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/servicio/out";
+        String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
+        //String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/servicio/out";
         StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                 new Response.Listener<String>()
                 {
@@ -312,6 +315,8 @@ public class TecnicosOut extends AppCompatActivity implements View.OnClickListen
                 params.put("copias",copias.getText().toString());
                 params.put("copiasColor",copiasColor.getText().toString());
                 params.put("viaje",viajeHora.getText().toString()+":"+viajeMinutos.getText().toString());
+                if(checboxCierre.isChecked())params.put("cierre","si");
+                else params.put( "cierre","no" );
 
 
                 Log.w(TAG,params.get( "id_tecnico" ));
