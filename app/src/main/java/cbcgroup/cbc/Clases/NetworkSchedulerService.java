@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -36,7 +37,8 @@ public class NetworkSchedulerService extends JobService implements
         ConnectivityReceiver.ConnectivityReceiverListener {
 
     private static final String TAG = "TESTINTERNET";
-    private static final String URLIMAGEN = "https://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
+    //private static final String URLIMAGEN = "https://tecnicos.cbcgroup.com.ar/test/app_android/v14/imagenTecnico.php";
+    private static final String URLIMAGEN="https://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
     private static final String URL = "http://tecnicos.cbcgroup.com.ar/Test/app_android/produccion/api/android.php/Insumos/uploadImg";
     private Context context;
     private ConnSQLiteHelper con;
@@ -88,7 +90,8 @@ public class NetworkSchedulerService extends JobService implements
         {
             //message="Conectado a internet";
                uploadImage2();
-              uploadImage();
+             uploadImage();
+
         }
         //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
 
@@ -98,8 +101,15 @@ public class NetworkSchedulerService extends JobService implements
     {
         SQLiteDatabase db = con.getWritableDatabase();
         Map<String, String> params = new Hashtable<>();
-        String SQL="SELECT id_tec,serie,id_parte,mensaje,copias,copiasColor,viaje,foto,Espera FROM "+ dbTecSinInternet.TABLE;
-        @SuppressLint("Recycle") Cursor resp=db.rawQuery( SQL,null );
+        Cursor resp = null;
+        String SQL="SELECT id_tec,serie,id_parte,mensaje,copias,copiasColor,viaje,cierre FROM "+ dbTecSinInternet.TABLE;
+        try {
+            resp = db.rawQuery( SQL, null );
+        }catch (SQLiteException e)
+        {
+            Log.w(TAG,"sqlError"+e);
+        }
+
         if(resp==null) return null;
         if(resp.moveToPosition( 0 ))
         {
@@ -113,7 +123,17 @@ public class NetworkSchedulerService extends JobService implements
             params.put("copias",resp.getString( 4 ));
             params.put("copiasColor",resp.getString( 5 ));
             params.put("viaje",resp.getString( 6 ));
-            params.put("foto", resp.getString( 7 ));
+            params.put("cierre", resp.getString(7  ));
+            Log.w(TAG,"ingreso");
+            Log.w(TAG, resp.getString( 0 ));
+            Log.w(TAG, resp.getString( 1 ));
+            Log.w(TAG, resp.getString( 2 ));
+            Log.w(TAG, resp.getString( 3 ));
+            Log.w(TAG, resp.getString( 4 ));
+            Log.w(TAG, resp.getString( 5 ));
+            Log.w(TAG, resp.getString( 6 ));
+            Log.w(TAG, resp.getString( 7 ));
+
         }
 
         db.close();
@@ -163,7 +183,7 @@ public class NetworkSchedulerService extends JobService implements
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-
+                            Log.w(TAG,"Error:"+volleyError);
                         }
                     } ) {
                 @Override

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -46,6 +47,7 @@ import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 import cbcgroup.cbc.dbLocal.Tablas.dbInsumosSinInternet;
 
 import static android.Manifest.permission.CAMERA;
@@ -345,6 +347,16 @@ public class CamActivity extends AppCompatActivity implements View.OnClickListen
         params.put(dbInsumosSinInternet.CAMPO_NPEDIDO,cbc.getInsumosNpedidos());
         SQLiteDatabase db=con.getWritableDatabase();
         sql.Add(db, dbInsumosSinInternet.TABLE,params);
+        db=con.getWritableDatabase();
+        String SQL = "DELETE FROM " + dbInsumos.TABLE+ " WHERE nPedido='" + cbc.getInsumosNpedidos() + "';";
+        try {
+            db.execSQL( SQL );
+            Log.w( TAG, "FILA BORRADA" );
+        } catch (SQLException e) {
+            Log.w( TAG, e.toString() );
+        }
+        db.close();
+
         startActivity( new Intent(this,HomeActivity.class ).putExtra( "homeStart","homeStart" ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP ));
     }
 }

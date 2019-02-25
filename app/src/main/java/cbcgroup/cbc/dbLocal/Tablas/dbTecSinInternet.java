@@ -12,6 +12,7 @@ public class dbTecSinInternet
             "[copias] TEXT  NOT NULL,\n" +
             "[copiasColor] TEXT  NOT NULL,\n" +
             "[viaje] TEXT  NOT NULL,\n" +
+            "[cierre] TEXT  NOT NULL,\n" +
             "[foto] TEXT  NULL,\n" +
             "[Espera] TEXT  NOT NULL\n" +
             ")";
@@ -26,5 +27,6 @@ public class dbTecSinInternet
     public static final String CAMPO_TVIAJE="viaje";
     public static final String CAMPO_FOTO="foto";
     public static final String CAMPO_ESPERA="Espera";
+    public static final String CAMPO_CIERRE="cierre";
 
 }

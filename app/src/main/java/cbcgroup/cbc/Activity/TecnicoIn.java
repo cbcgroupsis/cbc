@@ -25,6 +25,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -82,7 +85,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         {
             IngresoPedido();
 
-            /*DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm");
+          /*  DateFormat df = new SimpleDateFormat("HH:mm");
             String date = df.format(Calendar.getInstance().getTime());
             Log.w("HORA",date);*/
 
@@ -120,14 +123,16 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
     private void ingresoQuery()
     {
         RequestQueue requestQueue = Volley.newRequestQueue(TecnicoIn.this);
-        //String URL2 = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
-        String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/servicio/in";
+        cbc.progressDialog( "Ingresando...","Espere por favor..." );
+        String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicos.php";
+        //String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/servicio/in";
         StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                 new Response.Listener<String>()
                 {
                     @Override
                     public void onResponse(String s)
                     {
+                        cbc.progressDialogCancel();
                         //cbc.setIngresoTecnico(true);
                         //cbc.setIngresonpedido( extra.getString( "npedido" ));
                         sendNotificaction();
@@ -140,6 +145,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
                     @Override
                     public void onErrorResponse(VolleyError volleyError)
                     {
+                        cbc.progressDialogCancel();
                         Log.i( TAG,volleyError.toString());
                         Toast.makeText( TecnicoIn.this, "Error: "+volleyError.toString(), Toast.LENGTH_SHORT ).show();
                     }
@@ -149,10 +155,10 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
             protected Map<String, String> getParams()
             {
                 Map<String, String> params = new Hashtable<>();
-                params.put("llegada","1");
-                params.put("idTec",cbc.getdUserId() );
+                params.put("llegada","true");
+                params.put("id_tecnico",cbc.getdUserId() );
                 params.put("serie",serie.getText().toString());
-                params.put("nparte", extra.getString( "npedido" ));
+                params.put("id_parte", extra.getString( "npedido" ));
                 return params;
             }
 

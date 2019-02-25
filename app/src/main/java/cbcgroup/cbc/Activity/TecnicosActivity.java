@@ -85,6 +85,7 @@ public class TecnicosActivity  extends AppCompatActivity
         try {
             JSONObject response = new JSONObject( res );
             JSONArray jsonInsumos = response.getJSONArray( "lista_de_hoja_reparacion" );
+
             SQLiteDatabase db=con.getWritableDatabase();
             for(int a=0;a<jsonInsumos.length();a++)
             {
@@ -113,6 +114,7 @@ public class TecnicosActivity  extends AppCompatActivity
             adapter=new AdapterInsumos(TecnicosActivity.this,list,4);
             recyclerView.setAdapter(adapter);
         } catch (JSONException e) {
+            Toast.makeText( TecnicosActivity.this, "No hay pedidos tecnicos.", Toast.LENGTH_SHORT ).show(); finish();
             e.printStackTrace();
         }
     }
@@ -155,11 +157,7 @@ public class TecnicosActivity  extends AppCompatActivity
                     public void onResponse(String s)
                     {
                         cbc.progressDialogCancel();
-                        Log.w(TAG,"Resp:"+s);
-                        if(s.equals( "null" ))
-                        {
-                            Toast.makeText( TecnicosActivity.this, "No hay pedidos tecnicos.", Toast.LENGTH_SHORT ).show(); finish();
-                        }
+                        Log.w(TAG,"Resp:"+ s );
                         SQLiteDatabase db=con.getWritableDatabase();
                         sql.DeleteTabla( db, dbTecnicos.TABLE );
                         cbc.progressDialogCancel();
