@@ -28,12 +28,10 @@ import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.R;
 
 public class ReporteDeErroresActivity extends AppCompatActivity implements View.OnClickListener {
-    String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/v14/reportes.php";
-    SharedPreferences info;
-    String nombre;
-    String mail;
-    String mensaje;
-    EditText editText;
+    private String nombre;
+    private String mail;
+    private String mensaje;
+    private EditText editText;
     private Button btnEnviar;
     private LinearLayout linearLayout;
     private CBC cbc;
@@ -43,7 +41,7 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_reporte_de_errores );
         editText=findViewById( R.id.mensajeReporet );
-        info=getSharedPreferences( "userInfo",MODE_PRIVATE );
+        SharedPreferences info = getSharedPreferences( "userInfo", MODE_PRIVATE );
         btnEnviar=findViewById( R.id.btnRepor );
         linearLayout=findViewById( R.id.linearLayoutReporteDeErrores );
         linearLayout.setOnClickListener( this );
@@ -101,9 +99,10 @@ public class ReporteDeErroresActivity extends AppCompatActivity implements View.
 
 
 
-    void Internet(final String nombre, final String mensaje, final String mail)
+    private void Internet(final String nombre, final String mensaje, final String mail)
     {
 
+        String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/reportes.php";
         StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
                 new Response.Listener<String>()
                 {

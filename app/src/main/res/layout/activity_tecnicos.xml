@@ -33,14 +33,16 @@
                 android:layout_weight="0.9"
                 android:layout_width="match_parent"
                 android:backgroundTint="@color/colorPrimary"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:contentDescription="@string/imgrefresh"/>
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/myRecycler"
             android:layout_width="wrap_content"
             android:layout_below="@+id/mSearch"
+            android:clipToPadding="false"
             android:layout_height="wrap_content"
-            class="android.support.v7.widget.RecyclerView" />
+             />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

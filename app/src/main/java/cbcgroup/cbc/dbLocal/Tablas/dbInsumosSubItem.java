@@ -1,6 +1,6 @@
 package cbcgroup.cbc.dbLocal.Tablas;
 
-public class dbInsumosSubItem
+class dbInsumosSubItem
 {
     public static String CREATE_TABLE="CREATE TABLE [InsumosSubItem] (\n" +
             "[nPedido] TEXT  NOT NULL,\n" +

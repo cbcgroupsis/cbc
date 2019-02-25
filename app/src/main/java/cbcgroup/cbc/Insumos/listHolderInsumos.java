@@ -10,7 +10,7 @@ import cbcgroup.cbc.R;
 public class listHolderInsumos extends RecyclerView.ViewHolder implements View.OnClickListener
 {
     public TextView numPedido,nombreCliente,numSerie,modelo,oneDate,categoria,horaVence;
-    ItemClickListener itemClickListener;
+    private ItemClickListener itemClickListener;
     public listHolderInsumos(View itemView,int List)
     {
         super( itemView );
@@ -41,7 +41,7 @@ public class listHolderInsumos extends RecyclerView.ViewHolder implements View.O
     @Override
     public void onClick(View v)
     {
-        this.itemClickListener.onItemClick( v,getLayoutPosition() );
+        this.itemClickListener.onItemClick( getLayoutPosition() );
     }
     public void onLogClick(ItemClickListener ic){this.itemClickListener=ic;}
     public void itemClickListener(ItemClickListener ic)

@@ -1,6 +1,6 @@
 package cbcgroup.cbc.dbLocal;
 
-public class User
+class User
 {
     private Integer id;
     private String nombre;

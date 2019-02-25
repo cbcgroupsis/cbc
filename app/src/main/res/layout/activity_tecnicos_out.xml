@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:scrollbars="vertical"
     android:background="@drawable/gradient_color"
 
@@ -105,7 +105,7 @@
             <EditText
                 android:id="@+id/tarea_realizada"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="100dp"
                 android:autoSizeMaxTextSize="100sp"
                 android:autoSizeMinTextSize="1sp"
                 android:autoSizeStepGranularity="1sp"
@@ -113,6 +113,14 @@
                 android:background="@drawable/rounded_textviewa"
                 android:gravity="top|left"
                 android:inputType="textMultiLine" />
+            <CheckBox
+                android:id="@+id/checkboxCierre"
+                android:layout_width="match_parent"
+                android:layout_height="50px"
+                android:checked="true"
+                android:text="REPUESTO"
+                android:textColor="#ffff"
+                />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -134,7 +142,7 @@
 
                         <EditText
                             android:id="@+id/contadorColor"
-                            android:layout_width="200px"
+                            android:layout_width="match_parent"
                             android:layout_height="50px"
                             android:autoSizeMaxTextSize="100sp"
                             android:autoSizeMinTextSize="1sp"
@@ -146,14 +154,14 @@
                             android:hint="0" />
 
                         <TextView
-                            android:layout_width="200px"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Contador"
                             android:textColor="#ffffff" />
 
                         <EditText
                             android:id="@+id/contador"
-                            android:layout_width="200px"
+                            android:layout_width="match_parent"
                             android:layout_height="50px"
                             android:autoSizeMaxTextSize="100sp"
                             android:autoSizeMinTextSize="1sp"
@@ -165,13 +173,13 @@
                             android:hint="0" />
 
                         <TextView
-                            android:layout_width="200px"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="T. de viaje:"
                             android:textColor="#ffffff" />
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:weightSum="1">
@@ -211,34 +219,9 @@
                                 android:imeOptions="actionDone"
                                 android:inputType="datetime"/>
 
-
                         </LinearLayout>
-
-
                     </LinearLayout>
-                    <!-- der -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="0.5"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="200px"
-                            android:layout_height="wrap_content"
-                            android:text="Foto:"
-                            android:textColor="#ffffff" />
-                        <ImageButton
-                            android:id="@+id/imgTecnico"
-                            android:layout_width="200px"
-                            android:layout_height="200px"
-                            android:src="@drawable/img_icono_camara"
-                            android:background="@drawable/rounded_textviewa" />
-                    </LinearLayout>
-
-
                 </LinearLayout>
-
         </LinearLayout>
 
         <Button

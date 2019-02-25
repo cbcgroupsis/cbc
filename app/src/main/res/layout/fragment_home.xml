@@ -10,5 +10,6 @@
         android:id="@+id/imgInicio"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/imghomelogo"
         android:src="@drawable/img_logo_cbc_group_color"/>
 </FrameLayout>

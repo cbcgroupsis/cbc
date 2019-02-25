@@ -4,12 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,13 +42,11 @@ public class WebDct extends Fragment {
     private ProgressDialog progress;
     private String dato_aux;
     private String urll;
-    private ViewTreeObserver.OnScrollChangedListener mOnScrollChangedListener;
     SharedPreferences menu;
-    ProgressBar progressBar;
-    WebView mWebView;
-    SwipeRefreshLayout swipeRefreshLayout;
-    int upCont=0;
-    CBC cbc;
+    private ProgressBar progressBar;
+    private WebView mWebView;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private int upCont=0;
 
     public WebDct() {
         // Required empty public constructor
@@ -77,7 +73,7 @@ public class WebDct extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        cbc = new CBC(this.getActivity());
+        CBC cbc = new CBC( this.getActivity() );
         if (getArguments() != null) {
             urll=getArguments().getString( "dato_aux",null );
         }else
@@ -101,6 +97,7 @@ public class WebDct extends Fragment {
 
         swipeRefreshLayout = view.findViewById( R.id.swipe_web_dct );
         swipeRefreshLayout.setColorSchemeColors( 0x2196F3 );
+        ViewTreeObserver.OnScrollChangedListener mOnScrollChangedListener;
         swipeRefreshLayout.getViewTreeObserver().addOnScrollChangedListener( mOnScrollChangedListener = new ViewTreeObserver.OnScrollChangedListener()
         {
 
@@ -142,9 +139,9 @@ public class WebDct extends Fragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed() {
         if (mListener != null) {
-            mListener.onFragmentInteraction( uri );
+            mListener.onFragmentInteraction();
         }
     }
 
@@ -177,9 +174,9 @@ public class WebDct extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction();
     }
-    void Programa_principal()
+    private void Programa_principal()
     {
 
         progressBar.getIndeterminateDrawable().setColorFilter(0xff2196F3, PorterDuff.Mode.SRC_IN );

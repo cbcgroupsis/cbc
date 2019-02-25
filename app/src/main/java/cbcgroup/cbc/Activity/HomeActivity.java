@@ -6,7 +6,6 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -30,12 +29,7 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.evernote.android.job.JobRequest;
-
-import java.util.concurrent.TimeUnit;
-
 import cbcgroup.cbc.Clases.CBC;
-;
 import cbcgroup.cbc.Clases.NetworkSchedulerService;
 import cbcgroup.cbc.Fragment.HomeFragment;
 import cbcgroup.cbc.Fragment.InsumosFragment;
@@ -55,7 +49,6 @@ public class HomeActivity extends AppCompatActivity
 
     private static final String TAG = "TAG_HomeActivity";
     private NavigationView navigationView ;
-    private TextView edtNombreMenu,edtEmailMenu;
     private CBC cbc;
     private boolean webUse=false,fragmentUse=true;
 
@@ -65,7 +58,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_home );
-        Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
+        Toolbar toolbar = findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
         scheduleJob();
         navigationView  =  findViewById(R.id.nav_view);
@@ -73,7 +66,7 @@ public class HomeActivity extends AppCompatActivity
         Home();
         cbc= new CBC(HomeActivity.this);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById( R.id.fab );
+        FloatingActionButton fab = findViewById( R.id.fab );
         fab.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,19 +75,19 @@ public class HomeActivity extends AppCompatActivity
             }
         } );
 
-        DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
+        DrawerLayout drawer = findViewById( R.id.drawer_layout );
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close );
         drawer.addDrawerListener( toggle );
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById( R.id.nav_view );
+        NavigationView navigationView = findViewById( R.id.nav_view );
         navigationView.setNavigationItemSelectedListener( this );
 
     }
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
+        DrawerLayout drawer = findViewById( R.id.drawer_layout );
         if (drawer.isDrawerOpen( GravityCompat.START )) {
             drawer.closeDrawer( GravityCompat.START );
         } else {
@@ -216,49 +209,41 @@ public class HomeActivity extends AppCompatActivity
     }*/
     /***********************************************************************************************/
 
-    void menuInfo()
+    private void menuInfo()
     {
-        edtEmailMenu=findViewById( R.id.edtMailMenu );
-        edtNombreMenu=findViewById( R.id.edtNombreMenu);
+        TextView edtEmailMenu = findViewById( R.id.edtMailMenu );
+        TextView edtNombreMenu = findViewById( R.id.edtNombreMenu );
         edtNombreMenu.setText( cbc.getdUserName()+"-"+ cbc.getdUserSector() );
         edtEmailMenu.setText(cbc.getdUserEmail());
 
         //Dependiendo del tipo de usuario, muestro diferentes menus.
-        if (( cbc.getdUserSector().equals( "super admin" )) || ( cbc.getdUserSector().equals( "direccion" )) ||  ( cbc.getdUserSector().equals( "comercial" ))) {
+        if ((cbc.getdUserSector().equals( "super admin" )) || (cbc.getdUserSector().equals( "direccion" )) || (cbc.getdUserSector().equals( "comercial" ))) {
             navigationView.getMenu().setGroupVisible( R.id.menu_logistica, true );
             navigationView.getMenu().setGroupVisible( R.id.menu_cliente, true );
             navigationView.getMenu().setGroupVisible( R.id.menu_tecnicos, true );
             // cliente = true;
-        } else if (cbc.getdUserSector().equals( "tecnicos" ) || cbc.getdUserSector().equals( "usuarios interior" )) {
-            navigationView.getMenu().setGroupVisible( R.id.menu_tecnicos, true );
-        } else if (cbc.getdUserSector() .equals( "cac" ) || cbc.getdUserSector() .equals( "deposito" )) {
-            navigationView.getMenu().setGroupVisible( R.id.menu_logistica, true );
-        } else if (cbc.getdUserSector().equals( "Cliente" )) {
-            navigationView.getMenu().setGroupVisible( R.id.menu_cliente, true );
-            //  Web();
-            // cliente = true;
-            // cliente_aux = true;
-        } else if (cbc.getdUserSector().equals( "administracion" )) {
-
-        } else if (cbc.getdUserSector().equals( "comercial" )) {
-
-        } else if (cbc.getdUserSector().equals( "compras" )) {
-
-        } else if (cbc.getdUserSector().equals( "deposito" )) {
-
-        } else if (cbc.getdUserSector().equals( "reacondicionado" )) {
-
-        } else if (cbc.getdUserSector().equals( "sueldos" )) {
-
-        } else if (cbc.getdUserSector().equals( "supervisor" )) {
-
-        } else if (cbc.getdUserSector().equals( "usuarios interior" )) {
-
+        } else {
+            switch (cbc.getdUserSector()) {
+                case "tecnicos":
+                case "usuarios interior":
+                    navigationView.getMenu().setGroupVisible( R.id.menu_tecnicos, true );
+                    break;
+                case "cac":
+                case "deposito":
+                    navigationView.getMenu().setGroupVisible( R.id.menu_logistica, true );
+                    break;
+                case "Cliente":
+                    navigationView.getMenu().setGroupVisible( R.id.menu_cliente, true );
+                    //  Web();
+                    // cliente = true;
+                    // cliente_aux = true;
+                    break;
+            }
         }
 
 
     }
-    void WebDct()
+    private void WebDct()
     {
         Toast.makeText( this, "WEB-DCT", Toast.LENGTH_SHORT ).show();
         webUse=true;
@@ -272,7 +257,7 @@ public class HomeActivity extends AppCompatActivity
         transition.commit();
 
     }
-   void TecnicosFragment()
+   private void TecnicosFragment()
     {
         Toast.makeText( this, "Tecnicos", Toast.LENGTH_SHORT ).show();
         fragmentUse=true;
@@ -287,7 +272,7 @@ public class HomeActivity extends AppCompatActivity
 
 
 
-    void HomeFragmento()
+    private void HomeFragmento()
     {
         Toast.makeText( this, "HOME", Toast.LENGTH_SHORT ).show();
         HomeFragment home = new HomeFragment();
@@ -300,7 +285,7 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    void InsumosFragment()
+    private void InsumosFragment()
     {
         Toast.makeText( this, "INSUMOS", Toast.LENGTH_SHORT ).show();
         fragmentUse=true;
@@ -314,7 +299,7 @@ public class HomeActivity extends AppCompatActivity
 
     }
     //Redireccionamiento del WEB DCT
-    void Web_Redirect(String redirect)
+    private void Web_Redirect(String redirect)
     {
         //Inicializo primero el fragment webdct, para activar la sesion.
         WebDct();
@@ -332,7 +317,7 @@ public class HomeActivity extends AppCompatActivity
         transition.commit();
     }
 
-    void RutaDia()
+    private void RutaDia()
     {
 
 
@@ -368,7 +353,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onFragmentInteraction() {
 
     }
     /**********************************************************************************************/

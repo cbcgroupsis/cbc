@@ -2,12 +2,13 @@ package cbcgroup.cbc.Activity;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Canvas;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -29,29 +30,27 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import cbcgroup.cbc.Clases.CBC;
+import cbcgroup.cbc.Clases.SwipeController;
+import cbcgroup.cbc.Clases.SwipeControllerActions;
 import cbcgroup.cbc.Insumos.AdapterInsumos;
 import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
-import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
-import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecnicos;
 
 public class TecnicosActivity  extends AppCompatActivity
 {
 
-    private String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/prueba/servicioTecnico.php";
     private android.support.v7.widget.SearchView searchView;
     private RecyclerView recyclerView;
     private ListInsumo insumos = new ListInsumo();
     private AdapterInsumos adapter;
-    private ImageButton actualizar;
     private CBC cbc;
     private SQLite sql;
     private ConnSQLiteHelper con;
-    private String TAG="Tecnicos";
-    private String idTec="";
+    private final String TAG="Tecnicos";
+    private static String idTec="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +58,7 @@ public class TecnicosActivity  extends AppCompatActivity
         setContentView( R.layout.activity_tecnicos );
         searchView=findViewById( R.id.mSearch );
         recyclerView=findViewById( R.id.myRecycler );
-        actualizar=findViewById( R.id.actualizar );
+        ImageButton actualizar = findViewById( R.id.actualizar );
         recyclerView.setLayoutManager( new LinearLayoutManager( TecnicosActivity.this ) );
         recyclerView.setItemAnimator( new DefaultItemAnimator() );
         con =  new ConnSQLiteHelper( this);
@@ -76,14 +75,17 @@ public class TecnicosActivity  extends AppCompatActivity
             }
         } );
 
+
+
     }
-    void List(String  res)
+    private void List(String res)
     {
         final ArrayList<ListInsumo> list=new ArrayList<>();
         list.clear();
         try {
             JSONObject response = new JSONObject( res );
             JSONArray jsonInsumos = response.getJSONArray( "lista_de_hoja_reparacion" );
+
             SQLiteDatabase db=con.getWritableDatabase();
             for(int a=0;a<jsonInsumos.length();a++)
             {
@@ -112,11 +114,12 @@ public class TecnicosActivity  extends AppCompatActivity
             adapter=new AdapterInsumos(TecnicosActivity.this,list,4);
             recyclerView.setAdapter(adapter);
         } catch (JSONException e) {
+            Toast.makeText( TecnicosActivity.this, "No hay pedidos tecnicos.", Toast.LENGTH_SHORT ).show(); finish();
             e.printStackTrace();
         }
     }
 
-    void Search()
+    private void Search()
     {
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
@@ -133,7 +136,7 @@ public class TecnicosActivity  extends AppCompatActivity
         recyclerView.setAdapter(adapter);
     }
 
-    void Programa()
+    private void Programa()
     {
         cbc.progressDialog( "Cargando Pedidos Tecnicos...","Espere por favor..." );
         Bundle extra= getIntent().getExtras();
@@ -143,19 +146,18 @@ public class TecnicosActivity  extends AppCompatActivity
             idTec=extra.getString( "idTec" );
         }
         else idTec=cbc.getdUserId();
+
         RequestQueue requestQueue = Volley.newRequestQueue(TecnicosActivity.this);
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
+        //String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/prueba/servicioTecnico.php";
+        String URL ="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/parteDate/all?idTec="+idTec;
+        StringRequest stringRequest = new StringRequest( Request.Method.GET, URL,
                 new Response.Listener<String>()
                 {
                     @Override
                     public void onResponse(String s)
                     {
                         cbc.progressDialogCancel();
-                        Log.w(TAG,"Resp:"+s);
-                        if(s.equals( "null" ))
-                        {
-                            Toast.makeText( TecnicosActivity.this, "No hay pedidos tecnicos.", Toast.LENGTH_SHORT ).show(); finish();
-                        }
+                        Log.w(TAG,"Resp:"+ s );
                         SQLiteDatabase db=con.getWritableDatabase();
                         sql.DeleteTabla( db, dbTecnicos.TABLE );
                         cbc.progressDialogCancel();
@@ -172,17 +174,7 @@ public class TecnicosActivity  extends AppCompatActivity
                         Log.i( TAG,volleyError.toString());
                         Toast.makeText( TecnicosActivity.this, "Error: "+volleyError.toString(), Toast.LENGTH_SHORT ).show();
                     }
-                })
-        {
-            @Override
-            protected Map<String, String> getParams()
-            {
-                Map<String, String> params = new Hashtable<>();
-                params.put("idTec",idTec);
-                return params;
-            }
-
-        };
+                });
         requestQueue.add(stringRequest);
     }
 
@@ -223,7 +215,7 @@ public class TecnicosActivity  extends AppCompatActivity
         if(extra!=null) idTec=extra.getString( "idTec" );
         else idTec=cbc.getdUserId();
         SQLiteDatabase db=con.getWritableDatabase();
-        Map params = new Hashtable(  );
+        Map<String, String> params = new Hashtable<>(  );
         params.clear();
         params.put( dbTecnicos.CAMPO_NPARTE,nParte);
         params.put( dbTecnicos.CAMPO_CLIENTE,Cliente);
@@ -240,7 +232,7 @@ public class TecnicosActivity  extends AppCompatActivity
         sql.Add(db,dbTecnicos.TABLE,params);
 
     }
-    boolean TableValues()
+    private boolean TableValues()
     {
         Bundle extra= getIntent().getExtras();
         if(extra!=null) idTec=extra.getString( "idTec" );
@@ -255,10 +247,7 @@ public class TecnicosActivity  extends AppCompatActivity
             idParte = resp.getString( 0 );
         }
         db.close();
-        if (resp.getCount() != 0 && resp!=null)
-        {
-            return false;
-        }else return true;
+        return resp.getCount() == 0 || resp == null;
     }
 
 

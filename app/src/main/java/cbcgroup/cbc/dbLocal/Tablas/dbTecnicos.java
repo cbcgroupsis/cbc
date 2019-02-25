@@ -2,7 +2,7 @@ package cbcgroup.cbc.dbLocal.Tablas;
 
 public class dbTecnicos
 {
-    public static String CREATE_TABLE="CREATE TABLE [Tecnicos] (\n"+
+    public static final String CREATE_TABLE="CREATE TABLE [Tecnicos] (\n"+
         "[nParte] TEXT  UNIQUE NOT NULL ,\n"+
             "[idTec] TEXT NOT NULL ,\n"+
         "[Cliente] TEXT  NOT NULL,\n"+
@@ -17,17 +17,17 @@ public class dbTecnicos
         "[Inconveniente] TEXT  NOT NULL\n"+
         ")";
 
-    public static String TABLE="Tecnicos";
-    public static String CAMPO_NPARTE="nParte"; //
-    public static String CAMPO_CLIENTE="Cliente";//
-    public static String CAMPO_NSERIE="nSerie";//
-    public static String CAMPO_SECTOR="Sector";//
-    public static String CAMPO_FECHAVENCE="FechaVence";//
-    public static String CAMPO_FECHA="Fecha";//
-    public static String CAMPO_INCONVENIENTE="Inconveniente";
-    public static String CAMPO_MODELO="Modelo";
-    public static String CAMPO_INGRESO="Ingreso";
-    public static String CAMPO_IDTEC="idTec";
-    public static String CAMPO_CATEGORIA="Categoria";
-    public static String CAMPO_HORAVENCE="horaVence";
+    public static final String TABLE="Tecnicos";
+    public static final String CAMPO_NPARTE="nParte"; //
+    public static final String CAMPO_CLIENTE="Cliente";//
+    public static final String CAMPO_NSERIE="nSerie";//
+    public static final String CAMPO_SECTOR="Sector";//
+    public static final String CAMPO_FECHAVENCE="FechaVence";//
+    public static final String CAMPO_FECHA="Fecha";//
+    public static final String CAMPO_INCONVENIENTE="Inconveniente";
+    public static final String CAMPO_MODELO="Modelo";
+    public static final String CAMPO_INGRESO="Ingreso";
+    public static final String CAMPO_IDTEC="idTec";
+    public static final String CAMPO_CATEGORIA="Categoria";
+    public static final String CAMPO_HORAVENCE="horaVence";
 }

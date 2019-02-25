@@ -18,7 +18,7 @@ public class SQLite
         db.close();                                                                                 //Cierro la conexion.
     }
 
-    public String InsertValues(Map dato)
+    private String InsertValues(Map dato)
     {
         String camposSql="";
         for(int a=0;a<dato.size()-1;a++)
@@ -29,7 +29,7 @@ public class SQLite
         return camposSql;
     }
 
-    public String InsertCampos(Map dato)
+    private String InsertCampos(Map dato)
     {
         String camposSql="";
         for(int a=0;a<dato.size()-1;a++)
@@ -47,16 +47,8 @@ public class SQLite
         try
         {
             db.execSQL( SQL );
-        }catch (Exception e){}
+        }catch (Exception ignored){}
 
         db.close();
-    }
-
-    boolean Update(SQLiteDatabase db,String SQL)
-    {
-        try{db.execSQL( SQL );}
-        catch (Exception e) {return false;}
-        db.close();
-        return true;
     }
 }

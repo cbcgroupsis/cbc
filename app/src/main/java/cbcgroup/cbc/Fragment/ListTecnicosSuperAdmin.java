@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -32,16 +31,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
-import cbcgroup.cbc.Activity.TecnicosOut;
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.Insumos.AdapterInsumos;
 import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
-import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
-import cbcgroup.cbc.dbLocal.Tablas.dbTecSinInternet;
 
 
 public class ListTecnicosSuperAdmin extends Fragment {
@@ -49,22 +45,17 @@ public class ListTecnicosSuperAdmin extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     /**db*/
     private SQLite sql;
     private ConnSQLiteHelper con;
 
     private OnFragmentInteractionListener mListener;
-    public static final String TAG = "TecnicosSuperAdmin_Fragment";
-    private String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicosSuperAdmin.php";
+    private static final String TAG = "TecnicosSuperAdmin_Fragment";
     private android.support.v7.widget.SearchView searchView;
     private RecyclerView recyclerView;
-    private ImageButton actualizar;
-    ListInsumo insumos = new ListInsumo();
-    AdapterInsumos adapter;
-    CBC cbc;
+    private ListInsumo insumos = new ListInsumo();
+    private AdapterInsumos adapter;
+    private CBC cbc;
 
     public ListTecnicosSuperAdmin() {
         // Required empty public constructor
@@ -92,8 +83,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         if (getArguments() != null) {
-            mParam1 = getArguments().getString( ARG_PARAM1 );
-            mParam2 = getArguments().getString( ARG_PARAM2 );
+
         }
     }
 
@@ -106,7 +96,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
         sql = new SQLite();
         searchView=view.findViewById( R.id.mSearch );
         recyclerView=view.findViewById( R.id.myRecycler );
-        actualizar=view.findViewById( R.id.actualizar );
+        ImageButton actualizar = view.findViewById( R.id.actualizar );
         recyclerView.setLayoutManager( new LinearLayoutManager( getActivity() ) );
         recyclerView.setItemAnimator( new DefaultItemAnimator() );
         cbc=new CBC(getActivity());
@@ -127,9 +117,9 @@ public class ListTecnicosSuperAdmin extends Fragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed() {
         if (mListener != null) {
-            mListener.onFragmentInteraction( uri );
+            mListener.onFragmentInteraction();
         }
     }
 
@@ -151,9 +141,9 @@ public class ListTecnicosSuperAdmin extends Fragment {
     }
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction();
     }
-    void List(String  res)
+    private void List(String res)
     {
 
         final ArrayList<ListInsumo> list=new ArrayList<>();
@@ -166,8 +156,8 @@ public class ListTecnicosSuperAdmin extends Fragment {
             {
                 JSONObject obj=jsonInsumos.getJSONObject( a );
                 insumos=new ListInsumo();
-                insumos.setOneDate(obj.getString( "nombre" ));
-                SincronizarDbLocal( obj.getString( "nombre" ),obj.getString( "idTecnico" ));
+                insumos.setOneDate(obj.getString( "name" ));
+                SincronizarDbLocal( obj.getString( "name" ),obj.getString( "id" ));
                 list.add(insumos);
             }
             adapter=new AdapterInsumos(getActivity(),list,3);
@@ -178,7 +168,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
     }
 
 
-    void Search()
+    private void Search()
     {
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
@@ -195,11 +185,13 @@ public class ListTecnicosSuperAdmin extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
-    void Programa()
+    private void Programa()
     {
         cbc.progressDialog( "Cargando lista de tecnicos...","Espere por favor..." );
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,
+        //String URL = "http://tecnicos.cbcgroup.com.ar/test/app_android/v14/tecnicosSuperAdmin.php";
+        String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Tecnicos/listTec/all";
+        StringRequest stringRequest = new StringRequest( Request.Method.GET, URL,
                 new Response.Listener<String>()
                 {
                     @SuppressLint("LongLogTag")
@@ -230,8 +222,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
             @Override
             protected Map<String, String> getParams()
             {
-                Map<String, String> params = new Hashtable<>();
-                return params;
+                return new Hashtable<>();
             }
 
         };
@@ -240,7 +231,7 @@ public class ListTecnicosSuperAdmin extends Fragment {
     private void SincronizarDbLocal(String nombres,String idTec)
     {
         SQLiteDatabase db=con.getWritableDatabase();
-        Map params = new Hashtable(  );
+        Map<String, String> params = new Hashtable<String, String>(  );
         params.clear();
         params.put(dbNombresTecSa.CAMPO_NOMBRES,nombres);
         params.put(dbNombresTecSa.CAMPO_IDTEC,idTec);
@@ -272,22 +263,21 @@ public class ListTecnicosSuperAdmin extends Fragment {
     }
 
 
-    boolean TableValues()
+    private boolean TableValues()
     {
         SQLiteDatabase db = con.getWritableDatabase();
         String SQL = "";
         String idParte="";
         SQL = "SELECT * FROM " + dbNombresTecSa.TABLE;
         Cursor resp = db.rawQuery( SQL, null );
-        if (resp.moveToPosition( 0 )) {
+        if (resp.moveToPosition( 0 ))
+        {
 
             idParte = resp.getString( 0 );
         }
         db.close();
-        if (resp.getCount() != 0 && resp!=null)
-        {
-            return false;
-        }else return true;
+        return resp.getCount() == 0 || resp == null;
     }
-    //
+    //25309
+
 }

@@ -15,7 +15,7 @@ public class ConnSQLiteHelper extends SQLiteOpenHelper
 
     public ConnSQLiteHelper(Context context)
     {
-        super( context, "db_CBC", null, 4 );
+        super( context, "db_CBC", null, 5 );
 
     }
 
