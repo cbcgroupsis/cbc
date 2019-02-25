@@ -11,6 +11,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.ClientError;
+import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -81,7 +85,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         cbc.progressDialog( "Logeando...","Espere por favor..." );                   //Dialogo en pantalla indicando al usuario que se esta autentificando la informacion ingresada.
         RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);             //Creo una nueva cola de solicitud.
-        String URL="http://tecnicos.cbcgroup.com.ar/test/app_android/produccion/api/android.php/Login/authentication";
+        String URL="https://tecnicos.cbcgroup.com.ar/test/app_android/Proyectos/Api/account.php";
         StringRequest stringRequest = new StringRequest( Request.Method.POST, URL,                  //Creo una String de solicitud, en el cual cargo la URL y El metodo Post.
                 new Response.Listener<String>()
                 {
@@ -92,19 +96,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         try                                                                         //Utilizo un Try/Catch por si la respuesta es null para no tener problemas con la aplicacion.
                         {
                             JSONObject response = new JSONObject(s);                                 //Convierto el String en un Objeto.
-                            JSONArray res=response.getJSONArray( "Login" );                   //Busco en el objeto el key "Login" y convierto todos los objetos hijos en un arreglo.
+                            JSONArray res=response.getJSONArray( "signIn" );                   //Busco en el objeto el key "Login" y convierto todos los objetos hijos en un arreglo.
                             JSONObject obj = res.getJSONObject(0);                            //Obtengo los valores de la posicion 0 del arreglo.
-                            if(obj.getBoolean( "access" ))                    //Busco en la posicion 0 el valor del objeto "acceso". Si el valor es "true" significa que la autentificacion fue correcta.
-                            {
-                                if(sesion.isChecked()) cbc.setSession( true );                      //Verifico si el usuario quiere guardar la sesion, si es asi guardo la sesion.
-                                else cbc.setSession( false );                                       //caso contrario, indico que el usuario no quiere guardar la sesion.
-                                cbc.setUserName(obj.getString( "nombre" ) );                  //Obtengo el valor del objeto "nombre" y lo guardo en la memoria.
-                                cbc.setUserSector(obj.getString( "sector" ));                 //Obtengo el valor del objeto "sector" y lo guardo en la memoria.
-                                cbc.setUserId(obj.getString( "iduser" ) );                    //Obtengo el valor del objeto "iduser" y lo guardo en la memoria.
-                                cbc.setUserEmail(obj.getString( "mail" ) );                   //Obtengo el valor del objeto "mail" y lo guardo en la memoria.
-                                cbc.setUserPassword(userPassword.getText().toString());
-                                HomeStart();                                                        //Llamo al metodo HomeStart y inicializo la actividad Home.
-                            }else cbc.msg( "No se puede autentificar, verifique los datos ingresados" ); //Caso de que la autentificacion fuera erronea, indico que los datos ingresados fueron incorrectos.
+
+                            cbc.setSession(sesion.isChecked() );                      //Verifico si el usuario quiere guardar la sesion, si es asi guardo la sesion.
+                            cbc.setUserName(obj.getString( "name" ) );                  //Obtengo el valor del objeto "nombre" y lo guardo en la memoria.
+                            cbc.setUserSector(obj.getString( "type" ));                 //Obtengo el valor del objeto "sector" y lo guardo en la memoria.
+                            cbc.setUserId(obj.getString( "id" ) );                    //Obtengo el valor del objeto "iduser" y lo guardo en la memoria.
+                            cbc.setUserEmail(obj.getString( "mail" ) );                   //Obtengo el valor del objeto "mail" y lo guardo en la memoria.
+                            cbc.setUserPassword(userPassword.getText().toString());
+
+
+                            HomeStart();                                                        //Llamo al metodo HomeStart y inicializo la actividad Home.
                         } catch (Exception error)                                                   //
                         {
                             Log.w(TAG,"VolleyError->"+error);                                  //En caso de haber un error, lo muestro por consola.
@@ -118,7 +121,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     {
                         cbc.progressDialogCancel();                                                 //Cierro el dialogo.
                         cbc.debug( TAG,"voleyError->"+volleyError.toString() );               //Muestro en la consola el error.
-                        cbc.msg( volleyError.toString() );                                          //Muestro al usuario a travez de la pantalla el error.
+
+
+                        if(volleyError instanceof AuthFailureError)
+                        {
+                            cbc.msg( "No se puede autentificar, verifique los datos ingresados" );
+                        }else if( volleyError instanceof ClientError)
+                        {
+                            cbc.msg( "No se puede encontrar el archivo de login." );
+                        }else if(volleyError instanceof NetworkError)
+                        {
+                            cbc.msg( "No tiene Acceso a internet." );
+                        }
+
+
+
                     }
                 })
         {
@@ -126,9 +143,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             protected Map<String, String> getParams()
             {
                 Map<String, String> params = new Hashtable<>();                                     //Parametros a enviar.
-                params.put("userName",userName.getText().toString());                              //nombre del usuario
-                params.put("userPassword",userPassword.getText().toString());                      //contraseña.
-             //   params.put("token",token);                                                          //Envio el identificador unico del celular.
+                params.put("name",userName.getText().toString());                              //nombre del usuario
+                params.put("pass",userPassword.getText().toString());                      //contraseña.
                 return params;                                                                      //Envio los parametros por el metodo post.
             }
 
