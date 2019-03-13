@@ -6,6 +6,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -25,12 +26,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import cbcgroup.cbc.Clases.CBC;
 import cbcgroup.cbc.Clases.NetworkSchedulerService;
+import cbcgroup.cbc.Fragment.ClientesFragment;
 import cbcgroup.cbc.Fragment.HomeFragment;
 import cbcgroup.cbc.Fragment.InsumosFragment;
 import cbcgroup.cbc.Fragment.ListTecnicosSuperAdmin;
@@ -44,6 +47,7 @@ public class HomeActivity extends AppCompatActivity
         HomeFragment.OnFragmentInteractionListener,
         ListTecnicosSuperAdmin.OnFragmentInteractionListener,
         mapRutaDiaFragment.OnFragmentInteractionListener,
+        ClientesFragment.OnFragmentInteractionListener,
         WebDct.OnFragmentInteractionListener{
 
 
@@ -83,6 +87,8 @@ public class HomeActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById( R.id.nav_view );
         navigationView.setNavigationItemSelectedListener( this );
+
+
 
     }
     @Override
@@ -124,7 +130,9 @@ public class HomeActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id=item.getItemId();
-        if (id == R.id.home)Home();
+        if (id == R.id.home)
+                if(cbc.getdUserSector()=="Cliente") clienteDCT();
+                else Home();
         /********************LOGISTICA***************************/
         else if (id == R.id.logistica_insumos)InsumosFragment();
         /******************* Tecnicos *************************/
@@ -141,7 +149,7 @@ public class HomeActivity extends AppCompatActivity
         else if(id== R.id.cliente_pedidos_insumos) Web_Redirect("insumos");
         else if(id== R.id.cliente_tecnicos)Web_Redirect("tecnicos");
         else if(id== R.id.cliente_contadores) pantalla_en_construccion();
-        else if(id== R.id.cliente_preferencia)Web_Redirect("preferencias");
+        else if(id== R.id.cliente_preferencia)clienteDCT();
 
         /****************** Extras ***************************/
         else if (id == R.id.web_dct)WebDct();
@@ -234,7 +242,7 @@ public class HomeActivity extends AppCompatActivity
                     break;
                 case "Cliente":
                     navigationView.getMenu().setGroupVisible( R.id.menu_cliente, true );
-                    //  Web();
+                    clienteDCT();
                     // cliente = true;
                     // cliente_aux = true;
                     break;
@@ -337,7 +345,19 @@ public class HomeActivity extends AppCompatActivity
         transition.addToBackStack(null);
         transition.commit();
     }
-
+    private void clienteDCT()
+    {
+        Toast.makeText( this, "WEB-DCT", Toast.LENGTH_SHORT ).show();
+        webUse=true;
+        fragmentUse=true;
+        ClientesFragment webdct= new ClientesFragment();
+        webdct.setEnterTransition( new Slide( Gravity.BOTTOM ) );
+        webdct.setExitTransition( new Slide( Gravity.BOTTOM ) );
+        FragmentTransaction transition= getSupportFragmentManager().beginTransaction();
+        transition.replace(R.id.contenedor,webdct);
+        transition.addToBackStack(null);
+        transition.commit();
+    }
     private void Home()
     {
 
@@ -424,5 +444,10 @@ public class HomeActivity extends AppCompatActivity
         // Start service and provide it a way to communicate with this class.
         Intent startServiceIntent = new Intent(this, NetworkSchedulerService.class);
         startService(startServiceIntent);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

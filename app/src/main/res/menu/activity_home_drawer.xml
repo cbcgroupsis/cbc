@@ -60,7 +60,7 @@
                 <item
                     android:id="@+id/cliente_preferencia"
                     android:icon="@drawable/img_icono_preferencia"
-                    android:title="Preferencia" />
+                    android:title="Informe" />
             </menu>
         </item>
     </group>

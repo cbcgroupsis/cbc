@@ -6,8 +6,8 @@ android {
         applicationId "angel.cbcgroup"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 39
-        versionName "1.1.1.1.23"
+        versionCode 40
+        versionName "1.1.1.1.24"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -40,6 +40,8 @@ dependencies {
     implementation 'com.evernote:android-job:1.2.6'
     //Notificacion
     implementation "com.android.support:support-compat:27.0.0"
+
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
 
 
 
