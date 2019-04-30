@@ -1,0 +1,45 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cbcgroup.cbc.Fragment.GrafClientTecFragment">
+<LinearLayout
+    android:orientation="vertical"
+    android:background="@drawable/gradient_color"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <lecho.lib.hellocharts.view.PieChartView android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    </lecho.lib.hellocharts.view.PieChartView>
+    <Button
+        android:id="@+id/Solicitado"
+        android:text="Solicitado"
+        android:textColor="#ffffff"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="5dp"
+        android:background="#ffaa00"/>
+    <Button
+        android:id="@+id/Realizado"
+        android:text="Realizado"
+        android:textColor="#ffffff"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="5dp"
+        android:background="#00C853"/>
+    <Button
+        android:id="@+id/Aprobado"
+        android:text="Aprobado"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#ff0000" />
+
+
+</LinearLayout>
+
+</FrameLayout>

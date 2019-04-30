@@ -250,8 +250,8 @@ public class TecnicosActivity  extends AppCompatActivity
         String idParte="";
         SQL = "SELECT * FROM " + dbTecnicos.TABLE + " WHERE idTec='"+idTec+"'";
         Cursor resp = db.rawQuery( SQL, null );
-        if (resp.moveToPosition( 0 )) {
-
+        if (resp.moveToPosition( 0 ))
+        {
             idParte = resp.getString( 0 );
         }
         db.close();
@@ -260,6 +260,4 @@ public class TecnicosActivity  extends AppCompatActivity
             return false;
         }else return true;
     }
-
-
 }

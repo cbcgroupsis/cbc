@@ -4,7 +4,7 @@ public class dbTecSinInternet
 
 {
 
-    public static String CREATE_TABLE="CREATE TABLE [sinInternetTec] (\n" +
+    public static final String CREATE_TABLE="CREATE TABLE [sinInternetTec] (\n" +
             "[id_tec] TEXT  NOT NULL,\n" +
             "[serie] TEXT  NOT NULL,\n" +
             "[id_parte] TEXT  NOT NULL,\n" +
@@ -12,19 +12,21 @@ public class dbTecSinInternet
             "[copias] TEXT  NOT NULL,\n" +
             "[copiasColor] TEXT  NOT NULL,\n" +
             "[viaje] TEXT  NOT NULL,\n" +
+            "[cierre] TEXT  NOT NULL,\n" +
             "[foto] TEXT  NULL,\n" +
             "[Espera] TEXT  NOT NULL\n" +
             ")";
 
-    public static String TABLE="sinInternetTec";
-    public static String CAMPO_IDTEC="id_tec";
-    public static String CAMPO_SERIE="serie";
-    public static String CAMPO_IDPARTE="id_parte";
-    public static String CAMPO_MENSAJE="mensaje";
-    public static String CAMPO_COPIAS="copias";
-    public static String CAMPO_COPIASCOLOR="copiasColor";
-    public static String CAMPO_TVIAJE="viaje";
-    public static String CAMPO_FOTO="foto";
-    public static String CAMPO_ESPERA="Espera";
+    public static final String TABLE="sinInternetTec";
+    public static final String CAMPO_IDTEC="id_tec";
+    public static final String CAMPO_SERIE="serie";
+    public static final String CAMPO_IDPARTE="id_parte";
+    public static final String CAMPO_MENSAJE="mensaje";
+    public static final String CAMPO_COPIAS="copias";
+    public static final String CAMPO_COPIASCOLOR="copiasColor";
+    public static final String CAMPO_TVIAJE="viaje";
+    public static final String CAMPO_FOTO="foto";
+    public static final String CAMPO_ESPERA="Espera";
+    public static final String CAMPO_CIERRE="cierre";
 
 }

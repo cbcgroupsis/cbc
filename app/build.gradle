@@ -6,8 +6,8 @@ android {
         applicationId "angel.cbcgroup"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 38
-        versionName "1.1.1.1.22"
+        versionCode 41
+        versionName "1.1.1.1.25"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -27,20 +27,21 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
     //Desing
     implementation 'com.android.support:design:27.1.1'
-    //Internet
+//Internet
     implementation 'com.android.volley:volley:1.1.0'
-    //ListView
+//ListView
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
-    //Firebase
+//Firebase
 
-    //Detectar si hay conectividad a internet.
+//Detectar si hay conectividad a internet.
     implementation 'com.evernote:android-job:1.2.6'
-    //Notificacion
+//Notificacion
     implementation "com.android.support:support-compat:27.0.0"
-
+    implementation 'com.github.lecho:hellocharts-library:1.5.8@aar'
 
 
 }

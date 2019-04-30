@@ -39,6 +39,6 @@
         android:id="@+id/Version"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="v22" />
+        android:text="v25" />
 
 </LinearLayout>

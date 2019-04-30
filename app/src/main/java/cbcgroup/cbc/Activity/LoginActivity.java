@@ -85,7 +85,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     {
         cbc.progressDialog( "Logeando...","Espere por favor..." );                   //Dialogo en pantalla indicando al usuario que se esta autentificando la informacion ingresada.
         RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);             //Creo una nueva cola de solicitud.
-        StringRequest stringRequest = new StringRequest( Request.Method.POST, CfgCbc.ULRLOGIN,                  //Creo una String de solicitud, en el cual cargo la URL y El metodo Post.
+        String url="https://tecnicos.cbcgroup.com.ar/Test/app_android/v14/login.php";
+        StringRequest stringRequest = new StringRequest( Request.Method.POST, url,                  //Creo una String de solicitud, en el cual cargo la URL y El metodo Post.
                 new Response.Listener<String>()
                 {
                     @Override

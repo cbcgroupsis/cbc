@@ -35,6 +35,7 @@ import org.json.JSONObject;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Map;
@@ -45,6 +46,7 @@ import cbcgroup.cbc.Insumos.ListInsumo;
 import cbcgroup.cbc.R;
 import cbcgroup.cbc.dbLocal.ConnSQLiteHelper;
 import cbcgroup.cbc.dbLocal.SQLite;
+import cbcgroup.cbc.dbLocal.Tablas.dbGraficos;
 import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
 import cbcgroup.cbc.dbLocal.Tablas.dbTecnicos;
 
@@ -91,8 +93,13 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
     {
         if(v==button)
         {
-            IngresoPedido();
 
+            if(pedidosIsNull())IngresoPedido();
+            else
+                {
+                    Toast.makeText(this,"Por favor cierre servicio tecnico abierto.",Toast.LENGTH_LONG).show();
+                    sendNotificaction();
+                }
             /*DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm");
             String date = df.format(Calendar.getInstance().getTime());
             Log.w("HORA",date);*/
@@ -111,7 +118,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
             public void onClick(DialogInterface dialog, int which)
 
             {
-                Ingreso();
+
                 ingresoQuery();
 
             }
@@ -139,6 +146,7 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
                     {
                         //cbc.setIngresoTecnico(true);
                         //cbc.setIngresonpedido( extra.getString( "npedido" ));
+                        Ingreso();
                         sendNotificaction();
                         Toast.makeText( TecnicoIn.this, "Se ingreso correctamente!", Toast.LENGTH_SHORT ).show();
                         startActivity( new Intent(TecnicoIn.this,HomeActivity.class ).addFlags( Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP ));
@@ -272,7 +280,8 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
                             .setContentTitle("El parte "+resp.getString( 0 )+" de "+resp.getString( 1 ))
                             .setDefaults(Notification.DEFAULT_ALL);
                     NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-                    notificationManager.notify(++NOTIFICATION_ID,builder.build());
+                    //notificationManager.notify(++NOTIFICATION_ID,builder.build());
+                    notificationManager.notify(NOTIFICATION_ID,builder.build());
 
 
                 }
@@ -285,5 +294,25 @@ public class TecnicoIn extends AppCompatActivity implements View.OnClickListener
         }
         db.close();
     }
+
+    private boolean pedidosIsNull()
+    {
+        SQLiteDatabase db = con.getReadableDatabase();
+        String SQL="SELECT nParte FROM Tecnicos WHERE Ingreso='1';";
+        Cursor resp=db.rawQuery( SQL,null);
+
+        if(resp.getCount()==0)
+        {
+            db.close();
+            return true;
+        }
+        else
+            {
+                db.close();
+                return false;
+            }
+
+    }
+
 
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import cbcgroup.cbc.dbLocal.Tablas.dbGraficos;
 import cbcgroup.cbc.dbLocal.Tablas.dbInsumos;
 import cbcgroup.cbc.dbLocal.Tablas.dbInsumosSinInternet;
 import cbcgroup.cbc.dbLocal.Tablas.dbNombresTecSa;
@@ -15,7 +16,7 @@ public class ConnSQLiteHelper extends SQLiteOpenHelper
 
     public ConnSQLiteHelper(Context context)
     {
-        super( context, "db_CBC", null, 4 );
+        super( context, "db_CBC", null, 7 );
 
     }
 
@@ -27,6 +28,7 @@ public class ConnSQLiteHelper extends SQLiteOpenHelper
         db.execSQL( dbNombresTecSa.CREATE_TABLE );
         db.execSQL( dbInsumosSinInternet.CREATE_TABLE );
         db.execSQL( dbTecnicos.CREATE_TABLE );
+        db.execSQL( dbGraficos.CREATE_TABLE );
     }
 
     @Override
@@ -39,6 +41,7 @@ public class ConnSQLiteHelper extends SQLiteOpenHelper
             db.execSQL( "DROP TABLE IF EXISTS "+ dbInsumos.TABLE );
             db.execSQL( "DROP TABLE IF EXISTS "+ dbInsumosSinInternet.TABLE );
             db.execSQL( "DROP TABLE IF EXISTS "+ dbTecnicos.TABLE );
+            db.execSQL( "DROP TABLE IF EXISTS "+ dbGraficos.TABLE );
             onCreate( db );
         }
     }

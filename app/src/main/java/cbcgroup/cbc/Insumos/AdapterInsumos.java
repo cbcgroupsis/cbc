@@ -61,6 +61,7 @@ public class AdapterInsumos extends RecyclerView.Adapter<listHolderInsumos> impl
         if(List==2) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list2_subitem,null );
         if(List==3)v = LayoutInflater.from(parent.getContext()).inflate( R.layout.list3_onedate,null );
         if(List==4) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list4,null );
+        if(List==5) v= LayoutInflater.from(parent.getContext()).inflate( R.layout.list4,null );
 
         listHolderInsumos holder= new listHolderInsumos( v,List);
 

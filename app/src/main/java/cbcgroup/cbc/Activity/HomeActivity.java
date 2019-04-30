@@ -37,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 import cbcgroup.cbc.Clases.CBC;
 ;
 import cbcgroup.cbc.Clases.NetworkSchedulerService;
+import cbcgroup.cbc.Fragment.GrafClientInsumosFragment;
+import cbcgroup.cbc.Fragment.GrafClientTecFragment;
 import cbcgroup.cbc.Fragment.HomeFragment;
 import cbcgroup.cbc.Fragment.InsumosFragment;
 import cbcgroup.cbc.Fragment.ListTecnicosSuperAdmin;
@@ -50,6 +52,8 @@ public class HomeActivity extends AppCompatActivity
         HomeFragment.OnFragmentInteractionListener,
         ListTecnicosSuperAdmin.OnFragmentInteractionListener,
         mapRutaDiaFragment.OnFragmentInteractionListener,
+        GrafClientInsumosFragment.OnFragmentInteractionListener,
+        GrafClientTecFragment.OnFragmentInteractionListener,
         WebDct.OnFragmentInteractionListener{
 
 
@@ -72,15 +76,6 @@ public class HomeActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         Home();
         cbc= new CBC(HomeActivity.this);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById( R.id.fab );
-        fab.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make( view, "Pantalla en construccion", Snackbar.LENGTH_LONG )
-                        .setAction( "Action", null ).show();
-            }
-        } );
 
         DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -146,8 +141,8 @@ public class HomeActivity extends AppCompatActivity
 
         /******************* Cliente  ************************/
         else if(id== R.id.cliente_pedidos_insumos) Web_Redirect("insumos");
-        else if(id== R.id.cliente_tecnicos)Web_Redirect("tecnicos");
-        else if(id== R.id.cliente_contadores) pantalla_en_construccion();
+        else if(id== R.id.cliente_tecnicos)GrafTec();//startActivity( new Intent(HomeActivity.this,GraficoClienteTecActivity.class) );
+        else if(id== R.id.cliente_contadores)GrafInsumos(); //startActivity( new Intent(HomeActivity.this,GraficoClienteActivity.class) );
         else if(id== R.id.cliente_preferencia)Web_Redirect("preferencias");
 
         /****************** Extras ***************************/
@@ -235,6 +230,7 @@ public class HomeActivity extends AppCompatActivity
             navigationView.getMenu().setGroupVisible( R.id.menu_logistica, true );
         } else if (cbc.getdUserSector().equals( "Cliente" )) {
             navigationView.getMenu().setGroupVisible( R.id.menu_cliente, true );
+            GrafTec();
             //  Web();
             // cliente = true;
             // cliente_aux = true;
@@ -312,6 +308,31 @@ public class HomeActivity extends AppCompatActivity
         transition.addToBackStack(null);
         transition.commit();
 
+    }
+
+    void GrafInsumos()
+    {
+
+        fragmentUse=true;
+        GrafClientInsumosFragment  insumos = new GrafClientInsumosFragment();
+        insumos.setEnterTransition( new Slide( Gravity.RIGHT ) );
+        insumos.setExitTransition(new Slide(Gravity.BOTTOM));
+        FragmentTransaction transition= getSupportFragmentManager().beginTransaction();
+        transition.replace(R.id.contenedor,insumos);
+        transition.addToBackStack(null);
+        transition.commit();
+    }
+    void GrafTec()
+    {
+
+        fragmentUse=true;
+        GrafClientTecFragment  insumos = new GrafClientTecFragment();
+        insumos.setEnterTransition( new Slide( Gravity.RIGHT ) );
+        insumos.setExitTransition(new Slide(Gravity.BOTTOM));
+        FragmentTransaction transition= getSupportFragmentManager().beginTransaction();
+        transition.replace(R.id.contenedor,insumos);
+        transition.addToBackStack(null);
+        transition.commit();
     }
     //Redireccionamiento del WEB DCT
     void Web_Redirect(String redirect)

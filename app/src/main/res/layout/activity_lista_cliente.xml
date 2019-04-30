@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cbcgroup.cbc.Activity.listaClienteActivity">
+    <LinearLayout
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@color/cardview_light_background"
+            android:weightSum="1"
+            >
+            <android.support.v7.widget.SearchView
+                android:layout_weight="0.1"
+                android:id="@+id/mSearch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                />
+            <ImageButton
+                android:id="@+id/actualizar"
+                android:background="@drawable/img_icono_actualizar"
+                android:layout_weight="0.9"
+                android:layout_width="match_parent"
+                android:backgroundTint="@color/colorPrimary"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/myRecycler"
+            android:layout_width="wrap_content"
+            android:layout_below="@+id/mSearch"
+            android:layout_height="wrap_content"
+            class="android.support.v7.widget.RecyclerView" />
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
